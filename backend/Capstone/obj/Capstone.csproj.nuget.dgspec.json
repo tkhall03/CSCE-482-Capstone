@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dylle\\source\\repos\\Capstone\\Capstone\\Capstone.csproj": {}
+    "C:\\Users\\dylle\\source\\repos\\Capstone\\backend\\Capstone\\Capstone.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dylle\\source\\repos\\Capstone\\Capstone\\Capstone.csproj": {
+    "C:\\Users\\dylle\\source\\repos\\Capstone\\backend\\Capstone\\Capstone.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dylle\\source\\repos\\Capstone\\Capstone\\Capstone.csproj",
+        "projectUniqueName": "C:\\Users\\dylle\\source\\repos\\Capstone\\backend\\Capstone\\Capstone.csproj",
         "projectName": "Capstone",
-        "projectPath": "C:\\Users\\dylle\\source\\repos\\Capstone\\Capstone\\Capstone.csproj",
+        "projectPath": "C:\\Users\\dylle\\source\\repos\\Capstone\\backend\\Capstone\\Capstone.csproj",
         "packagesPath": "C:\\Users\\dylle\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dylle\\source\\repos\\Capstone\\Capstone\\obj\\",
+        "outputPath": "C:\\Users\\dylle\\source\\repos\\Capstone\\backend\\Capstone\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\dylle\\AppData\\Roaming\\NuGet\\NuGet.Config",
