@@ -14,7 +14,7 @@ namespace Capstone.Controllers
             _personService = personService;
         }
 
-        [HttpGet("/persons/classes")]
+        [HttpGet("/persons/getClasses")]
         public async Task<IActionResult> GetClassesPerTermAsync()
         {
             var classes = await _personService.GetClassesPerTermAsync();
