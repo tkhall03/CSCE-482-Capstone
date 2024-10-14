@@ -5,6 +5,7 @@ obj/
 # User-specific files
 .vscode/
 .vs/
+../.vs/
 *.user
 *.rsuser
 *.suo
