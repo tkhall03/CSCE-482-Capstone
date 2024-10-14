@@ -23,9 +23,5 @@ namespace Capstone.Data
                 .UsingEntity(j => j.ToTable("PersonClass"));
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer("CapstoneDB");
-        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Capstone.Data;
 using Capstone.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Capstone.Services
 {
@@ -32,6 +33,12 @@ namespace Capstone.Services
             };
 
             return Task.FromResult(new Class[] { classEntity });
+        }
+
+        public async Task<Person> GetPersonByIdAsync(int personId)
+        {
+            var person = await _context.Persons.FirstOrDefaultAsync(x => x.Id == personId);
+            return person;
         }
     }
 }

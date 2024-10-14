@@ -11,9 +11,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-
 builder.Services.AddDbContext<SeaAggieCorpContext>(options =>
-    options.UseSqlServer("CapstoneDB"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("CapstoneDB")));
 
 
 builder.Services.AddScoped<IPersonService, PersonService>();

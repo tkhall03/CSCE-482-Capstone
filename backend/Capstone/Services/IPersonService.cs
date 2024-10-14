@@ -6,5 +6,7 @@ namespace Capstone.Services
     {
 
         Task<Class[]> GetClassesPerTermAsync();
+
+        Task<Person> GetPersonByIdAsync(int id);
     }
 }

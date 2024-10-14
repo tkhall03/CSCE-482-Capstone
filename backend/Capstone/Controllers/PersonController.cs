@@ -28,5 +28,17 @@ namespace Capstone.Controllers
             return Ok(classes); 
         }
 
+        [HttpGet("/persons/{personId}")]
+        public async Task<IActionResult> GetPersonById(int personId)
+        {
+            var person = await _personService.GetPersonByIdAsync(personId);
+
+            if (person == null)
+            {
+                return NotFound("No person with that id found");
+            }
+            return Ok(person);
+        }
+
     }
 }
