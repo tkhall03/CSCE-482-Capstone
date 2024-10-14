@@ -1,0 +1,97 @@
+{
+    "classes": [
+        {
+            "term": "Fall 2024",
+            "status": true,
+            "classes": [
+                {
+                    "primaryKey": 1,
+                    "className": "MARE 205",
+                    "sections": [
+                        {
+                            "sectionNumber": "199"
+                        },
+                        {
+                            "sectionNumber": "299"
+                        },
+                        {
+                            "sectionNumber": "399"
+                        }
+                    ]
+                },
+                {
+                    "primaryKey": 2,
+                    "className": "MARE 301",
+                    "sections": [
+                        {
+                            "sectionNumber": "482"
+                        },
+                        {
+                            "sectionNumber": "521"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "term": "Spring 2024",
+            "status": false,
+            "classes": [
+                {
+                    "primaryKey": 3,
+                    "className": "MARE 250",
+                    "sections": [
+                        {
+                            "sectionNumber": "211"
+                        },
+                        {
+                            "sectionNumber": "345"
+                        }
+                    ]
+                },
+                {
+                    "primaryKey": 4,
+                    "className": "MARE 405",
+                    "sections": [
+                        {
+                            "sectionNumber": "234"
+                        },
+                        {
+                            "sectionNumber": "564"
+                        },
+                        {
+                            "sectionNumber": "134"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "term": "Fall 2023",
+            "status": false,
+            "classes": [
+                {
+                    "primaryKey": 5,
+                    "className": "MARE 102",
+                    "sections": [
+                        {
+                            "sectionNumber": "111"
+                        }
+                    ]
+                },
+                {
+                    "primaryKey": 6,
+                    "className": "MARE 130",
+                    "sections": [
+                        {
+                            "sectionNumber": "256"
+                        },
+                        {
+                            "sectionNumber": "128"
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

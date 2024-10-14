@@ -11,6 +11,8 @@ const config: Config = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        'aggie-maroon': '#500000',
+        'fadded-aggie-maroon': '#50000066',
       },
     },
   },
