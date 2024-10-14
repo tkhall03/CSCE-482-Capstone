@@ -3,3 +3,56 @@
 ################################################################################
 
 /backend/.vs
+/.vs/CSCE482/v17
+
+```
+# Build Folders
+bin/
+obj/
+
+# User-specific files
+.vscode/
+.vs/
+../.vs/
+.backend/vs/
+*.user
+*.rsuser
+*.suo
+
+# Logs
+*.log
+
+# Database
+*.mdf
+*.ldf
+
+# Azure files
+.localhistory/
+
+# Visual Studio Code specific files
+.history/
+
+# ASP.NET Core secrets
+secrets.json
+
+# NPM packages
+node_modules/
+
+# Packages folder
+packages/
+
+# Backup & Temporary files
+*.tmp
+*.bak
+*.swp
+
+# JetBrains Rider project files
+.idea/
+
+# Entity Framework Migrations
+[Migrations]
+
+# Publish output folder
+publish/
+
+```
