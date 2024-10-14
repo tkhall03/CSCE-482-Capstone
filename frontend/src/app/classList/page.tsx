@@ -6,14 +6,21 @@ import Wrapper from "../components/Wrapper";
 import { useState, useEffect } from 'react'
 import { Divider } from '@mantine/core';
 import { DIVIDER_SIZES } from '@mantine/core';
+import { IconAlertTriangleFilled } from '@tabler/icons-react';
 
 interface Section{
     sectionNumber: string
+    SampleTestDOA: number,
+    Syllabus: number,
+    Attendance: number,
+    taskComplete: number
 }
 
 interface Class{
     primaryKey: number,
     className: string,
+    designation: number,
+    taskRequired: number,
     sections: Section[]
 }
 
@@ -40,6 +47,47 @@ export default function classList(){
         fetchClasses()
     }, [])
 
+    function getStatusTasks(classSection: Section, designation: number, numTaskRequired: number, active: boolean){
+
+        let numStatusComplete = classSection.SampleTestDOA + classSection.Attendance + classSection.Syllabus
+        let numTaskComplete = classSection.taskComplete
+
+        // <div className={`text-${numStatusComplete == 3 ? "green-600 " : "red-700 "} mx-2 ${active ? "" : "text-opacity-40 "}`}>Status: {numStatusComplete}/3</div>
+        // <div className={`text-${numTaskComplete == numTaskRequired ? "green-600 " : "red-700 "} mx-2 ${active ? "" : "text-opacity-40 "}`}>Tasks: {numTaskComplete}/{numTaskRequired}</div>
+
+        if(numStatusComplete == 3){
+            console.log("meer");
+        }
+
+        return(
+            <div className="flex">
+                <div className="flex">
+                    <div className={`${numStatusComplete == 3 ? "" : "text-ut-orange "} mx-2 ${active ? "" : "text-opacity-40 "}`}>Status: {numStatusComplete}/3</div>
+                    {
+                        numStatusComplete != 3 ?
+                            <IconAlertTriangleFilled className="fill-ut-orange"/>
+                        :
+                            <></>
+                    }
+                </div>
+                    {
+                        designation == 1 ?
+                            <div className="flex">
+                                <div className={`text-${numTaskComplete == numTaskRequired ? "" : "ut-orange "} mx-2 ${active ? "" : "text-opacity-40 "}`}>Tasks: {numTaskComplete}/{numTaskRequired}</div>
+                                {
+                                    numTaskComplete != numTaskRequired ?
+                                        <IconAlertTriangleFilled className="fill-ut-orange"/>
+                                    :
+                                    <></>
+                                }
+                            </div>
+                        :
+                            <></>
+                    }
+            </div>
+        )
+    }
+
     return (
         <div className="bg-white w-full">
       	    <NavBar/>
@@ -58,7 +106,7 @@ export default function classList(){
                                                         <button key={i} className={`z-10 mx-10 font-bold border-4 rounded-xl ${term.status ? "border-aggie-maroon text-aggie-maroon" : "border-fadded-aggie-maroon text-fadded-aggie-maroon" }`}>
                                                             <div className="flex flex-col p-2">
                                                                 <div>Section: {classSection.sectionNumber}</div>
-                                                                <div>Status: 0/3</div>
+                                                                {getStatusTasks(classSection, termClass.designation, termClass.taskRequired, term.status)}
                                                             </div>
                                                         </button>
                                                     ))

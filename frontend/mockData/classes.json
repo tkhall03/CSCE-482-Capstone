@@ -7,27 +7,51 @@
                 {
                     "primaryKey": 1,
                     "className": "MARE 205",
+                    "designation": 0,
+                    "taskRequired": -1,
                     "sections": [
                         {
-                            "sectionNumber": "199"
+                            "sectionNumber": "199",
+                            "SampleTestDOA": 0,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": -1
                         },
                         {
-                            "sectionNumber": "299"
+                            "sectionNumber": "299",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": -1
                         },
                         {
-                            "sectionNumber": "399"
+                            "sectionNumber": "399",
+                            "SampleTestDOA": 0,
+                            "Syllabus": 0,
+                            "Attendance": 0,
+                            "taskComplete": -1
                         }
                     ]
                 },
                 {
                     "primaryKey": 2,
                     "className": "MARE 301",
+                    "designation": 1,
+                    "taskRequired": 10,
                     "sections": [
                         {
-                            "sectionNumber": "482"
+                            "sectionNumber": "482",
+                            "SampleTestDOA": 0,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": 3
                         },
                         {
-                            "sectionNumber": "521"
+                            "sectionNumber": "521",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": 8
                         }
                     ]
                 }
@@ -40,27 +64,51 @@
                 {
                     "primaryKey": 3,
                     "className": "MARE 250",
+                    "designation": 1,
+                    "taskRequired": 7,
                     "sections": [
                         {
-                            "sectionNumber": "211"
+                            "sectionNumber": "211",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": 7 
                         },
                         {
-                            "sectionNumber": "345"
+                            "sectionNumber": "345",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": 7
                         }
                     ]
                 },
                 {
                     "primaryKey": 4,
                     "className": "MARE 405",
+                    "designation": 0,
+                    "taskRequired": -1,
                     "sections": [
                         {
-                            "sectionNumber": "234"
+                            "sectionNumber": "234",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": -1
                         },
                         {
-                            "sectionNumber": "564"
+                            "sectionNumber": "564",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": -1
                         },
                         {
-                            "sectionNumber": "134"
+                            "sectionNumber": "134",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": -1
                         }
                     ]
                 }
@@ -73,21 +121,37 @@
                 {
                     "primaryKey": 5,
                     "className": "MARE 102",
+                    "designation": 0,
+                    "taskRequired": -1,
                     "sections": [
                         {
-                            "sectionNumber": "111"
+                            "sectionNumber": "111",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": -1
                         }
                     ]
                 },
                 {
                     "primaryKey": 6,
                     "className": "MARE 130",
+                    "designation": 1,
+                    "taskRequired": 5,
                     "sections": [
                         {
-                            "sectionNumber": "256"
+                            "sectionNumber": "256",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": 5
                         },
                         {
-                            "sectionNumber": "128"
+                            "sectionNumber": "128",
+                            "SampleTestDOA": 1,
+                            "Syllabus": 1,
+                            "Attendance": 1,
+                            "taskComplete": 5
                         }
                     ]
                 }
