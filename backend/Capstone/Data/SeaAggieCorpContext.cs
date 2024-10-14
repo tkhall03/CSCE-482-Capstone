@@ -21,6 +21,7 @@ namespace Capstone.Data
                 .HasMany(p => p.Classes)
                 .WithMany(c => c.Persons)
                 .UsingEntity(j => j.ToTable("PersonClass"));
+
         }
 
     }

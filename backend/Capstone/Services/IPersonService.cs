@@ -5,7 +5,7 @@ namespace Capstone.Services
     public interface IPersonService
     {
 
-        Task<Class[]> GetClassesPerTermAsync();
+        Task<List<Class>> GetClassesPerTermAsync(int personId);
 
         Task<Person> GetPersonByIdAsync(int id);
     }

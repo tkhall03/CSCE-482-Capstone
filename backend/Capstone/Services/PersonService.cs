@@ -13,26 +13,12 @@ namespace Capstone.Services
             _context = context;
         }
 
-        public Task<Class[]> GetClassesPerTermAsync()
+        public async Task<List<Class>> GetClassesPerTermAsync(int personId)
         {
+            var classes = await _context.Persons.Where(p => p.Id == personId).SelectMany(p => p.Classes).ToListAsync();
 
+            return classes;
            
-            var classEntity = new Class { 
-                Id = 1,
-                Section = 100,
-                CourseRegistrationNumber = 1,
-                StartDate = DateTime.Now,
-                EndDate = null,
-                Schedule = "some schedule",
-                Time = "12:00pm",
-                CourseRelation = "some relation",
-                Persons =
-                {
-                    new Person{Id = 1, Name = "Dyllen Faustin" }
-                }
-            };
-
-            return Task.FromResult(new Class[] { classEntity });
         }
 
         public async Task<Person> GetPersonByIdAsync(int personId)

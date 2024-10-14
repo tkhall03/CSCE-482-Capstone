@@ -14,21 +14,21 @@ namespace Capstone.Controllers
             _personService = personService;
         }
 
-        [HttpGet("/persons/getClasses")]
-        public async Task<IActionResult> GetClassesPerTermAsync()
+        [HttpGet("/persons/{id}/getClasses")]
+        public async Task<IActionResult> GetClassesPerTermAsync(int personId)
         {
-            var classes = await _personService.GetClassesPerTermAsync();
+            var classes = await _personService.GetClassesPerTermAsync(personId);
 
        
-            if (classes == null || classes.Length == 0)
-            {
-                return NotFound($"No classes found for person with ID");
-            }
+            //if (classes == null || classes.Length == 0)
+            //{
+            //    return NotFound($"No classes found for person with ID");
+            //}
 
             return Ok(classes); 
         }
 
-        [HttpGet("/persons/{personId}")]
+        [HttpGet("/persons/")]
         public async Task<IActionResult> GetPersonById(int personId)
         {
             var person = await _personService.GetPersonByIdAsync(personId);
