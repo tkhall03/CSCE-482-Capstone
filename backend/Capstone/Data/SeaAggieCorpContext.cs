@@ -9,7 +9,7 @@ namespace Capstone.Data
         public DbSet<Course> Courses { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<Term> Terms { get; set; }
-
+        public DbSet<Document> Documents { get; set; }
 
         public SeaAggieCorpContext(DbContextOptions<SeaAggieCorpContext> options) : base(options)
         {
