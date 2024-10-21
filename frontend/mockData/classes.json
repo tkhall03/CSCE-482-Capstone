@@ -8,9 +8,9 @@
                     "primaryKey": 1,
                     "className": "MARE 205",
                     "designation": 0,
-                    "taskRequired": -1,
                     "sections": [
                         {
+                            "sectionPK": 1,
                             "sectionNumber": "199",
                             "SampleTestDOA": 0,
                             "Syllabus": 1,
@@ -18,6 +18,7 @@
                             "taskComplete": -1
                         },
                         {
+                            "sectionPK": 2,
                             "sectionNumber": "299",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -25,6 +26,7 @@
                             "taskComplete": -1
                         },
                         {
+                            "sectionPK": 3,
                             "sectionNumber": "399",
                             "SampleTestDOA": 0,
                             "Syllabus": 0,
@@ -37,20 +39,23 @@
                     "primaryKey": 2,
                     "className": "MARE 301",
                     "designation": 1,
-                    "taskRequired": 10,
                     "sections": [
                         {
+                            "sectionPK": 4,
                             "sectionNumber": "482",
                             "SampleTestDOA": 0,
                             "Syllabus": 1,
                             "Attendance": 1,
+                            "taskRequired": 10,
                             "taskComplete": 3
                         },
                         {
+                            "sectionPK": 5,
                             "sectionNumber": "521",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
                             "Attendance": 1,
+                            "taskRequired": 10,
                             "taskComplete": 8
                         }
                     ]
@@ -68,6 +73,7 @@
                     "taskRequired": 7,
                     "sections": [
                         {
+                            "sectionPK": 6,
                             "sectionNumber": "211",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -75,6 +81,7 @@
                             "taskComplete": 7 
                         },
                         {
+                            "sectionPK": 7,
                             "sectionNumber": "345",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -90,6 +97,7 @@
                     "taskRequired": -1,
                     "sections": [
                         {
+                            "sectionPK": 8,
                             "sectionNumber": "234",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -97,6 +105,7 @@
                             "taskComplete": -1
                         },
                         {
+                            "sectionPK": 9,
                             "sectionNumber": "564",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -104,6 +113,7 @@
                             "taskComplete": -1
                         },
                         {
+                            "sectionPK": 10,
                             "sectionNumber": "134",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -125,6 +135,7 @@
                     "taskRequired": -1,
                     "sections": [
                         {
+                            "sectionPK": 11,
                             "sectionNumber": "111",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -140,6 +151,7 @@
                     "taskRequired": 5,
                     "sections": [
                         {
+                            "sectionPK": 12,
                             "sectionNumber": "256",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -147,6 +159,7 @@
                             "taskComplete": 5
                         },
                         {
+                            "sectionPK": 13,
                             "sectionNumber": "128",
                             "SampleTestDOA": 1,
                             "Syllabus": 1,
@@ -157,5 +170,79 @@
                 }
             ]
         }
-    ]
+    ],
+    "GetSectionByID:1":
+        {
+            "ClassPK": 1,
+            "CRN": "2222",
+            "SectionNum": "123",
+            "SampleTestDOA": 0,
+            "Syllabus": 1,
+            "Attendance": 1,
+            "taskRequired": -1,
+            "taskComplete": -1,
+            "Documents": [
+                {
+                    "DocumentPK": 1,
+                    "Type": "Sample Test/D.O.A",
+                    "NameUploader": "Thomas Hall",
+                    "TimeUploaded": "XX:XX:XXX",
+                    "valid": true,
+                    "FileName": "Syllabus.pdf",
+                    "supportedTask": [
+                        {
+                            "TaskPK": 1,
+                            "TaskNum": "01-A",
+                            "TaskDescription": "Do something"
+                        },
+                        {
+                            "TaskPK": 2,
+                            "TaskNum": "02-A",
+                            "TaskDescription": "Do something"
+                        }
+                    ]
+                },
+                {
+                    "DocumentPK": 2,
+                    "Type": "Attendance",
+                    "NameUploader": "Thomas Hall",
+                    "TimeUploaded": "XX:XX:XXX",
+                    "valid": true,
+                    "FileName": "Attendance.pdf",
+                    "supportedTask": [
+                        {
+                            "TaskPK": 3,
+                            "TaskNum": "03-A",
+                            "TaskDescription": "Do something"
+                        },
+                        {
+                            "TaskPK": 4,
+                            "TaskNum": "04-A",
+                            "TaskDescription": "Do something"
+                        }
+                    ]
+                },
+                {
+                    "DocumentPK": 3,
+                    "Type": "Supporting Document",
+                    "NameUploader": "Thomas Hall",
+                    "TimeUploaded": "XX:XX:XXX",
+                    "valid": true,
+                    "FileName": "ExtraDocument.pdf",
+                    "supportedTask": [
+                        {
+                            "TaskPK": 5,
+                            "TaskNum": "05-A",
+                            "TaskDescription": "Do something"
+                        },
+                        {
+                            "TaskPK": 6,
+                            "TaskNum": "06-A",
+                            "TaskDescription": "Do something"
+                        }
+                    ]
+                }
+            ]
+        }
+    
 }

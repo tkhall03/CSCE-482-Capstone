@@ -9,7 +9,8 @@ import { DIVIDER_SIZES } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
 
 interface Section{
-    sectionNumber: string
+    sectionPK: number,
+    sectionNumber: string,
     SampleTestDOA: number,
     Syllabus: number,
     Attendance: number,
@@ -51,9 +52,6 @@ export default function classList(){
 
         let numStatusComplete = classSection.SampleTestDOA + classSection.Attendance + classSection.Syllabus
         let numTaskComplete = classSection.taskComplete
-
-        // <div className={`text-${numStatusComplete == 3 ? "green-600 " : "red-700 "} mx-2 ${active ? "" : "text-opacity-40 "}`}>Status: {numStatusComplete}/3</div>
-        // <div className={`text-${numTaskComplete == numTaskRequired ? "green-600 " : "red-700 "} mx-2 ${active ? "" : "text-opacity-40 "}`}>Tasks: {numTaskComplete}/{numTaskRequired}</div>
 
         if(numStatusComplete == 3){
             console.log("meer");
