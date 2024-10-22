@@ -176,11 +176,13 @@
             "ClassPK": 1,
             "CRN": "2222",
             "SectionNum": "123",
+            "ClassName": "MARA 205",
             "SampleTestDOA": 0,
             "Syllabus": 1,
             "Attendance": 1,
-            "taskRequired": -1,
-            "taskComplete": -1,
+            "designation": 1,
+            "taskRequired": 55,
+            "taskComplete": 15,
             "Documents": [
                 {
                     "DocumentPK": 1,

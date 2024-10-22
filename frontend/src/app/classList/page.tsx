@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react'
 import { Divider } from '@mantine/core';
 import { DIVIDER_SIZES } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
+import Link from 'next/link'
 
 interface Section{
     sectionPK: number,
@@ -35,7 +36,6 @@ interface ClassList{
 export default function classList(){
     
     const [classes, setClasses] = useState<ClassList[]>([]);
-    // {term: "", status: false, classes: []}
 
     async function fetchClasses(){
         let response = await fetch('http://localhost:4000/classes')
@@ -53,14 +53,10 @@ export default function classList(){
         let numStatusComplete = classSection.SampleTestDOA + classSection.Attendance + classSection.Syllabus
         let numTaskComplete = classSection.taskComplete
 
-        if(numStatusComplete == 3){
-            console.log("meer");
-        }
-
         return(
             <div className="flex">
                 <div className="flex">
-                    <div className={`${numStatusComplete == 3 ? "" : "text-ut-orange "} mx-2 ${active ? "" : "text-opacity-40 "}`}>Status: {numStatusComplete}/3</div>
+                    <div className={`${numStatusComplete == 3 ? "" : "text-ut-orange "} mx-2 ${active ? "" : "text-opacity-40 "}`}>Documents: {numStatusComplete}/3</div>
                     {
                         numStatusComplete != 3 ?
                             <IconAlertTriangleFilled className="fill-ut-orange"/>
@@ -101,12 +97,14 @@ export default function classList(){
                                             <Wrapper label={termClass.className} className="m-2 bg-inherit " disabled={!term.status}>
                                                 {
                                                     termClass.sections.map((classSection, i) => (
-                                                        <button key={i} className={`z-10 mx-10 font-bold border-4 rounded-xl ${term.status ? "border-aggie-maroon text-aggie-maroon" : "border-fadded-aggie-maroon text-fadded-aggie-maroon" }`}>
-                                                            <div className="flex flex-col p-2">
-                                                                <div>Section: {classSection.sectionNumber}</div>
-                                                                {getStatusTasks(classSection, termClass.designation, termClass.taskRequired, term.status)}
-                                                            </div>
-                                                        </button>
+                                                        <Link href={`/class/${termClass.primaryKey}`}>
+                                                            <button key={i} className={`z-10 mx-10 font-bold border-4 rounded-xl ${term.status ? "border-aggie-maroon text-aggie-maroon" : "border-fadded-aggie-maroon text-fadded-aggie-maroon" }`}>
+                                                                <div className="flex flex-col p-2">
+                                                                    <div>Section: {classSection.sectionNumber}</div>
+                                                                    {getStatusTasks(classSection, termClass.designation, termClass.taskRequired, term.status)}
+                                                                </div>
+                                                            </button>
+                                                        </Link>
                                                     ))
                                                 }
                                             </Wrapper>
