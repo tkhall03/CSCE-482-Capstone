@@ -3,35 +3,36 @@
 import NavBar from "../../components/NavBar";
 
 import { useState, useEffect, forwardRef } from 'react'
-import { Divider, DIVIDER_SIZES, Modal, HoverCard, TextInput } from '@mantine/core';
+import { Divider, Modal, HoverCard, TextInput } from '@mantine/core';
 import { IconAlertTriangleFilled, IconDotsVertical, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { Document, Page, pdfjs } from 'react-pdf';
+import { useParams } from 'next/navigation'
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 
 interface ClassData{
-    ClassPK: number,
-    CRN: string,
-    SectionNum: string, 
-    SampleTestDOA: number,
-    Syllabus: number,
-    Attendance: number,
+    classId: number,
+    crn: string,
+    sectionNumber: string, 
+    sampleTestDOA: number,
+    syllabus: number,
+    attendance: number,
     taskRequired: number,
-    taskComplete: number,
-    Documents: Document[]
-    ClassName: string,
-    designation: number,
+    taskCompleted: number,
+    documents: DocumentProp[]
+    className: string,
+    deptNo: number,
 }
 
-interface Document{
-    DocumentPK: number,
-    Type: string,
-    NameUploader: string,
-    TimeUploaded: string,
+interface DocumentProp{
+    documentID: number,
+    type: string,
+    nameUploader: string,
+    timeUploaded: string,
     valid: boolean,
-    FileName: string,
-    supportedTask: Task[]
+    fileName: string,
+    tasks: Task[]
 }
 
 interface Task{
@@ -40,9 +41,11 @@ interface Task{
     TaskDescription: string
 }
 
-export default function classList({ props }: { props: { classId: number } }){
-    
-    const [documents, setDocuments] = useState<Document[]>([]);
+export default function classList(){
+
+    const params = useParams();
+
+    const [documents, setDocuments] = useState<DocumentProp[]>([]);
     const [classes, setClasses] = useState<ClassData>();
     const [documentBlob, setDocumentBlob] = useState<string>('');
     const [pageNumber, setPageNumber] = useState<number>(1);
@@ -50,20 +53,16 @@ export default function classList({ props }: { props: { classId: number } }){
     const [numPages, setNumPages] = useState<number>(0);
     const [openFileName, setOpenFileName] = useState<string>('test.pdf');
 
-    async function fetchClassData(){
-        let response = await fetch('http://localhost:4000/GetSectionByID:1')
+    async function fetchClassData(classId: number){
+        let response = await fetch(`http://localhost:5248/classes/${classId}`)
         let data = await response.json()
         console.log(data)
         setClasses(data)
-        setDocuments(data.Documents)
+        setDocuments(data.documents)
     }
 
-    useEffect(() => {
-        fetchClassData()
-    }, [])
-
     async function fetchPdf(documentNum: number){
-        let response = await fetch(`http://localhost:5248/api/Documents/9`, { headers: {responseType: 'blob'}})
+        let response = await fetch(`http://localhost:5248/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
         let file = await response.blob();
         let reader = new FileReader();
         reader.readAsDataURL(file);
@@ -75,8 +74,10 @@ export default function classList({ props }: { props: { classId: number } }){
     }
 
     useEffect(() => {
-        // fetchPdf()
-    }, [])
+        if(params){
+            fetchClassData(params?.classId)
+        }
+    }, [params])
 
     // when document loaded sets total number of pages of the document
     const handlePDFLoadSuccess = ({ numPages }) => {
@@ -104,13 +105,13 @@ export default function classList({ props }: { props: { classId: number } }){
         const feilds = ["Syllabus", "Attendance", "Sample Test"]
         let feildComplete;
         if(feild == 0){
-            feildComplete = (classes?.Syllabus == 1);
+            feildComplete = (classes?.syllabus == 1);
         }
         else if(feild == 1){
-            feildComplete = (classes?.Attendance == 1);
+            feildComplete = (classes?.attendance == 1);
         }
         else{
-            feildComplete = (classes?.SampleTestDOA == 1);
+            feildComplete = (classes?.sampleTestDOA == 1);
         }
 
         return(
@@ -133,9 +134,9 @@ export default function classList({ props }: { props: { classId: number } }){
             <NavBar/>
             <div className="h-1/5 w-fill flex text-aggie-maroon font-bold"> 
                 <div className="mt-4 ml-4 text-4xl w-1/6">
-                    {classes?.ClassName}
+                    {classes?.className}
                     <div className="text-2xl">
-                        Section: {classes?.SectionNum}
+                        Section: {classes?.sectionNumber}
                     </div>
                 </div>
                 <div className="text-2xl w-1/2 mt-4">
@@ -150,14 +151,14 @@ export default function classList({ props }: { props: { classId: number } }){
                 </div>
                 <div className="text-3xl mt-4 ml-16">
                     {
-                        classes?.designation == 1 ?
+                        classes?.deptNo == 1 ?
                             <div>
                                 <div className="text-3xl">
                                     Required Tasks:
                                 </div>
-                                <div className={`ml-12 flex w-full text-2xl ${classes?.taskComplete == classes?.taskRequired ? "text-aggie-maroon" : "text-ut-orange"}`}>
-                                    {classes?.taskComplete} / {classes?.taskRequired}
-                                    {classes?.taskComplete != classes?.taskRequired ? <IconAlertTriangleFilled className="ml-1 m-auto fill-ut-orange" stroke={3}/> : <></>}
+                                <div className={`ml-12 flex w-full text-2xl ${classes?.taskCompleted == classes?.taskRequired ? "text-aggie-maroon" : "text-ut-orange"}`}>
+                                    {classes?.taskCompleted} / {classes?.taskRequired}
+                                    {classes?.taskCompleted != classes?.taskRequired ? <IconAlertTriangleFilled className="ml-1 m-auto fill-ut-orange" stroke={3}/> : <></>}
                                 </div>
                             </div>
                         :
@@ -166,7 +167,7 @@ export default function classList({ props }: { props: { classId: number } }){
                 </div>
                 <div className="text-3xl ml-16 h-full flex">
                     {
-                        classes?.designation == 1 ?
+                        classes?.deptNo == 1 ?
                             <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4">
                                 View Tasks
                             </button>
@@ -200,20 +201,20 @@ export default function classList({ props }: { props: { classId: number } }){
             </div>
             <div className="h-full">
                 {
-                    documents.map((document, idx) => (
-                        <button className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(document.DocumentPK), setPdfModalOpen(true), setOpenFileName(document.FileName))}>
+                    documents.map((doc, idx) => (
+                        <button className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(doc.documentID), setPdfModalOpen(true), setOpenFileName(doc.fileName))}>
                             <div key={idx} className={"flex w-screen h-full m-auto text-aggie-maroon p-1 text-lg"}>
                                 <div className="ml-4 w-1/3 my-auto">
-                                    {document.FileName}
+                                    {doc.fileName}
                                 </div>
                                 <div className="w-1/5 my-auto">
-                                    {document.NameUploader}
+                                    {doc.nameUploader}
                                 </div>
                                 <div className="w-1/5 my-auto">
-                                    {document.TimeUploaded}
+                                    {doc.timeUploaded}
                                 </div>
                                 <div className="w-1/6 my-auto">
-                                    {document.Type}
+                                    {doc.type}
                                 </div>
                                 <button className="my-auto">
                                     <IconDotsVertical stroke={3} />
@@ -266,7 +267,6 @@ export default function classList({ props }: { props: { classId: number } }){
                         </HoverCard>
                     </Modal.Body>
                 </Modal.Content>
-            {/* </Modal> */}
             </Modal.Root>
         </div>
     );

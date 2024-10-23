@@ -8,39 +8,43 @@ import { Divider } from '@mantine/core';
 import { DIVIDER_SIZES } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 interface Section{
-    sectionPK: number,
+    classId: number,
     sectionNumber: string,
-    SampleTestDOA: number,
-    Syllabus: number,
-    Attendance: number,
-    taskComplete: number
+    sampleTestDOA: number,
+    syllabus: number,
+    attendance: number,
+    taskRequired: number,
+    taskCompleted: number,
+    crn: number,
 }
 
 interface Class{
-    primaryKey: number,
-    className: string,
+    catalogId: number,
+    catalogName: string,
     designation: number,
-    taskRequired: number,
-    sections: Section[]
+    classes: Section[]
 }
 
 interface ClassList{
-    term: string,
+    termCode: string,
+    termId: number,
     status: boolean,
-    classes: Class[]
+    catalogs: Class[]
 }
 
 
 export default function classList(){
     
+    const router = useRouter();
+
     const [classes, setClasses] = useState<ClassList[]>([]);
 
     async function fetchClasses(){
-        let response = await fetch('http://localhost:4000/classes')
+        let response = await fetch('http://localhost:5248/persons/1/getClasses')
         let data = await response.json()
-        console.log(data)
         setClasses(data)
     }
 
@@ -50,8 +54,8 @@ export default function classList(){
 
     function getStatusTasks(classSection: Section, designation: number, numTaskRequired: number, active: boolean){
 
-        let numStatusComplete = classSection.SampleTestDOA + classSection.Attendance + classSection.Syllabus
-        let numTaskComplete = classSection.taskComplete
+        let numStatusComplete = classSection.sampleTestDOA + classSection.attendance + classSection.syllabus
+        let numTaskComplete = classSection.taskCompleted
 
         return(
             <div className="flex">
@@ -90,21 +94,19 @@ export default function classList(){
                 {
                     classes.map((term, index) => (
                         <div key={index} className="w-full ">
-                            <Divider size={8} label={term.term}  styles={{ label: { color: `${!term.status? '#50000066' : '#500000'}`,  fontSize: '30px', fontWeight: 'bold'} }} labelPosition="center" color={`${!term.status? '#50000066' : '#500000'}`}/>
+                            <Divider size={8} label={term.termCode}  styles={{ label: { color: `${!term.status? '#50000066' : '#500000'}`,  fontSize: '30px', fontWeight: 'bold'} }} labelPosition="center" color={`${!term.status? '#50000066' : '#500000'}`}/>
                                 {
-                                    term.classes.map((termClass, idx) => (
+                                    term.catalogs.map((termClass, idx) => (
                                         <div key={idx}>
-                                            <Wrapper label={termClass.className} className="m-2 bg-inherit " disabled={!term.status}>
+                                            <Wrapper label={termClass.catalogName} className="m-2 bg-inherit " disabled={!term.status}>
                                                 {
-                                                    termClass.sections.map((classSection, i) => (
-                                                        <Link href={`/class/${termClass.primaryKey}`}>
-                                                            <button key={i} className={`z-10 mx-10 font-bold border-4 rounded-xl ${term.status ? "border-aggie-maroon text-aggie-maroon" : "border-fadded-aggie-maroon text-fadded-aggie-maroon" }`}>
+                                                    termClass.classes.map((classSection, i) => (
+                                                            <button key={i} className={`z-10 mx-10 font-bold border-4 rounded-xl ${term.status ? "border-aggie-maroon text-aggie-maroon" : "border-fadded-aggie-maroon text-fadded-aggie-maroon" }`} onClick={() => router.push(`/class/${classSection.classId}`, { classId: `${classSection.classId}` })}>
                                                                 <div className="flex flex-col p-2">
                                                                     <div>Section: {classSection.sectionNumber}</div>
-                                                                    {getStatusTasks(classSection, termClass.designation, termClass.taskRequired, term.status)}
+                                                                    {getStatusTasks(classSection, termClass.designation, classSection.taskRequired, term.status)}
                                                                 </div>
                                                             </button>
-                                                        </Link>
                                                     ))
                                                 }
                                             </Wrapper>
