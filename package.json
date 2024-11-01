@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@mantine/core": "^7.13.2",
+    "@mantine/dropzone": "^7.13.4",
     "@mantine/hooks": "^7.13.2",
     "@tabler/icons": "^3.19.0",
     "@tabler/icons-react": "^3.19.0",
@@ -17,6 +18,7 @@
     "next": "14.2.14",
     "react": "^18",
     "react-dom": "^18",
+    "react-hook-form": "^7.53.1",
     "react-pdf": "^9.1.1",
     "react-router-dom": "^6.27.0"
   },
