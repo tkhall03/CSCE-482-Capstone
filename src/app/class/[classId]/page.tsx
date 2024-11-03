@@ -3,13 +3,14 @@
 import NavBar from "../../components/NavBar";
 
 import { useState, useEffect, forwardRef } from 'react'
-import { Divider, Modal, HoverCard, TextInput } from '@mantine/core';
+import { Divider, Modal, HoverCard, TextInput, Textarea } from '@mantine/core';
 import { IconAlertTriangleFilled, IconDotsVertical, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useParams } from 'next/navigation'
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import moment from 'moment';
 
 interface ClassData{
     classId: number,
@@ -41,6 +42,23 @@ interface Task{
     TaskDescription: string
 }
 
+interface DocumentInfo{
+    documentId: number,
+    valid: boolean,
+    voidRemarks: string,
+    voidUser: string,
+    voidDateTime: string,
+    uploadUser: string,
+    uploadDateTime: string,
+    remarks: Remark[]
+}
+
+interface Remark{
+    remark: string,
+    remarkUser: string,
+    remarkDate: string
+}
+
 export default function classList(){
 
     const params = useParams();
@@ -51,7 +69,11 @@ export default function classList(){
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pdfModalOpen, setPdfModalOpen] = useState<boolean>(false);
     const [numPages, setNumPages] = useState<number>(0);
-    const [openFileName, setOpenFileName] = useState<string>('test.pdf');
+    const [openFileName, setOpenFileName] = useState<string>("");
+    const [detailsFileName, setDetailsFileName] = useState<string>("");
+    const [detailsModalOpen, setDetailsModalOpen] = useState<boolean>(false);
+    const [newRemark, setNewRemark] = useState<string>("");
+    const [documentDetails, setDocumentDetails] = useState<DocumentInfo>();
 
     async function fetchClassData(classId: number){
         let response = await fetch(`http://localhost:5248/classes/${classId}`)
@@ -73,6 +95,11 @@ export default function classList(){
         };
     }
 
+    async function fetchDocumentData(documentId: number){
+        let response = await fetch(`http://localhost:5248/api/Documents/info/${documentId}`);
+        setDocumentDetails(await response.json());
+    }
+
     useEffect(() => {
         if(params){
             fetchClassData(params?.classId)
@@ -85,9 +112,9 @@ export default function classList(){
     };
 
     const PdfComponent = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>((props, ref) => (
-        <div ref={ref} {...props} className="m-auto w-fit h-fit">
-            <Document className="w-fit h-fit"file={`data:application/pdf;base64,${documentBlob}`} onLoadSuccess={handlePDFLoadSuccess}>
-                <Page className="w-fit h-fit"  height={screen.height * .6} pageNumber={pageNumber} />
+        <div ref={ref} {...props} className="m-auto w-fit !h-full">
+            <Document className="!w-full !h-full" file={`data:application/pdf;base64,${documentBlob}`} onLoadSuccess={handlePDFLoadSuccess}>
+                <Page className="!w-full" height={screen.height * .6} pageNumber={pageNumber} />
             </Document>
         </div>
     ));
@@ -211,12 +238,12 @@ export default function classList(){
                                     {doc.nameUploader}
                                 </div>
                                 <div className="w-1/5 my-auto">
-                                    {doc.timeUploaded}
+                                    {moment.utc(doc.timeUploaded).format('MMM Do YYYY, hh:mm A')}
                                 </div>
                                 <div className="w-1/6 my-auto">
                                     {doc.type}
                                 </div>
-                                <button className="my-auto">
+                                <button className="my-auto" onClick={() => (setDetailsFileName(doc.fileName), setDetailsModalOpen(true), fetchDocumentData(doc.documentID))}>
                                     <IconDotsVertical stroke={3} />
                                 </button>
                             </div>
@@ -243,8 +270,8 @@ export default function classList(){
                         </Modal.Title>
                         <Modal.CloseButton style={{color: '#500000'}} size="xl"/>
                     </Modal.Header>
-                    <Modal.Body>
-                        <HoverCard shadow="md" offset={-screen.height * .1} disabled={numPages === 0}>
+                    <Modal.Body className="!h-[44rem]">
+                        <HoverCard shadow="md" offset={-screen.height * .1}>
                             <HoverCard.Target className='h-full'>
                                 <PdfComponent/>
                             </HoverCard.Target>
@@ -265,6 +292,74 @@ export default function classList(){
                                     </button>
                             </HoverCard.Dropdown>
                         </HoverCard>
+                    </Modal.Body>
+                </Modal.Content>
+            </Modal.Root>
+            <Modal.Root opened={detailsModalOpen} onClose={() => (setDetailsModalOpen(false), setNewRemark(""))} size="600" centered>
+                <Modal.Overlay />
+                <Modal.Content className="">
+                    <Modal.Header>
+                        <Modal.Title>
+                            <div className="ml-8 text-2xl text-aggie-maroon font-bold">
+                                {`${detailsFileName} Details`}
+                            </div>
+                        </Modal.Title>
+                        <Modal.CloseButton style={{color: '#500000'}} size="xl"/>
+                    </Modal.Header>
+                    <Modal.Body className="!h-[44rem]">
+                        <div className=" h-full w-full flex flex-col">
+                            <div className="basis-4/6">
+                                
+                                {
+                                    !documentDetails?.valid ?
+                                        <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col">
+                                            <div>Document Voided</div>
+                                            <div className="mx-auto">
+                                                {documentDetails?.voidRemarks}
+                                            </div>
+                                            <div className="flex justify-evenly text-xl">
+                                                <div>{documentDetails?.voidUser}</div>
+                                                <div>{moment.utc(documentDetails?.uploadDateTime).format('MMM Do YYYY, hh:mm A')}</div>
+                                            </div>
+                                        </div>
+                                    :
+                                    <></>
+                                }
+                                <div className="text-2xl text-aggie-maroon font-bold ml-4 mb-4">Remarks</div>
+                                <div className="border-4 border-aggie-maroon rounded-xl py-4 overflow-auto mx-4">
+                                    {
+                                        documentDetails?.remarks.map((remark, idx) => (
+                                            <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col">
+                                                <div className="mx-auto">
+                                                    {remark.remark}
+                                                </div>
+                                                <div className="flex justify-evenly text-xl">
+                                                    <div>{remark.remarkUser}</div>
+                                                    <div>{moment.utc(remark.remarkDate).format('MMM Do YYYY, hh:mm A')}</div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            </div>
+                            <div className="basis-2/6 flex flex-col w-full">
+                                <div className="px-4 text-2xl font-bold text-aggie-maroon">
+                                    New Remark
+                                </div>
+                                <Textarea
+                                    value={newRemark}
+                                    onChange={(event) => setNewRemark(event.currentTarget.value)}
+                                    className="!w-full px-4 mx-auto mt-4 !border-aggie-maroon"
+                                    radius="md"
+                                    placeholder="New Remark"
+                                    size="md"
+                                    styles={{input: {height: "7rem", borderColor: "#500000", borderWidth: "4px"}}}
+                                />
+                                <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 ml-auto mr-4 rounded-xl">
+                                    Add New Remark
+                                </button>
+                            </div>
+                        </div>
                     </Modal.Body>
                 </Modal.Content>
             </Modal.Root>
