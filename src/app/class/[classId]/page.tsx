@@ -42,10 +42,17 @@ interface Task{
     TaskDescription: string
 }
 
+
+interface DocType {
+    docTypeId: number,
+    type: string
+}
+
 export default function classList(){
 
     const params = useParams();
 
+    const [docTypes, setdocTypes] = useState<DocType[]>([]);
     const [documents, setDocuments] = useState<DocumentProp[]>([]);
     const [classes, setClasses] = useState<ClassData>();
     const [documentBlob, setDocumentBlob] = useState<string>('');
@@ -58,6 +65,18 @@ export default function classList(){
 
     const handleUploadOpenModal = () => setIsUploadModalOpen(true);
     const handleUploadCloseModal = () => setIsUploadModalOpen(false);
+
+    async function fetchDocTypes(){
+        let response = await fetch(`https://localhost:7096/api/Documents/types`)
+        let data = await response.json() 
+        const fetchedDocTypes: DocType[] = [];
+        data.forEach((docType: DocType) => {
+            fetchedDocTypes.push(docType)
+        });
+        setdocTypes(fetchedDocTypes);
+
+    }
+
 
     async function fetchClassData(classId: number){
         let response = await fetch(`https://localhost:7096/classes/${classId}`)
@@ -83,6 +102,7 @@ export default function classList(){
         if(params){
             fetchClassData(params?.classId)
         }
+        fetchDocTypes();
     }, [params])
 
     // when document loaded sets total number of pages of the document
@@ -252,6 +272,7 @@ export default function classList(){
                     <UploadDoc 
                         classId={classes?.classId} 
                         className={classes?.className}
+                        docTypes={docTypes}
                     />
                 </Modal>
             </div>
