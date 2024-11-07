@@ -43,7 +43,7 @@ export default function classList(){
     const [classes, setClasses] = useState<ClassList[]>([]);
 
     async function fetchClasses(){
-        let response = await fetch('http://localhost:5248/persons/1/getClasses')
+        let response = await fetch('https://localhost:7096/persons/getClasses/1');
         let data = await response.json()
         setClasses(data)
     }

@@ -4,7 +4,7 @@ import UploadDocument from "./components/UploadDoc";
 export default function Home() {
   return (
     <div className="">
-      	<NavBar/>
+      	<UploadDocument/>
 
     </div>
   );

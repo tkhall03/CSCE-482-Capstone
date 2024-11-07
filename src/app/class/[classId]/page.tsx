@@ -10,6 +10,7 @@ import { useParams } from 'next/navigation'
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import UploadDoc from "@/app/components/UploadDoc";
 
 interface ClassData{
     classId: number,
@@ -53,8 +54,13 @@ export default function classList(){
     const [numPages, setNumPages] = useState<number>(0);
     const [openFileName, setOpenFileName] = useState<string>('test.pdf');
 
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+    const handleUploadOpenModal = () => setIsUploadModalOpen(true);
+    const handleUploadCloseModal = () => setIsUploadModalOpen(false);
+
     async function fetchClassData(classId: number){
-        let response = await fetch(`http://localhost:5248/classes/${classId}`)
+        let response = await fetch(`https://localhost:7096/classes/${classId}`)
         let data = await response.json()
         console.log(data)
         setClasses(data)
@@ -62,7 +68,7 @@ export default function classList(){
     }
 
     async function fetchPdf(documentNum: number){
-        let response = await fetch(`http://localhost:5248/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
+        let response = await fetch(`https://localhost:7096/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
         let file = await response.blob();
         let reader = new FileReader();
         reader.readAsDataURL(file);
@@ -228,9 +234,26 @@ export default function classList(){
                 }
             </div>
             <div className="h-32 bg-aggie-maroon flex text-white text-2xl font-bold">
-                <button className="ml-8 my-auto border-4 rounded-xl h-3/5 w-64">
+                <button 
+                    className="ml-8 my-auto border-4 rounded-xl h-3/5 w-64"
+                    onClick={handleUploadOpenModal}
+                >
                     Upload Document
                 </button>
+
+                {/* Modal component */}
+                <Modal 
+                    opened={isUploadModalOpen} 
+                    onClose={handleUploadCloseModal} 
+                    title="Upload Document"
+                    size="lg" 
+                >
+                    
+                    <UploadDoc 
+                        classId={classes?.classId} 
+                        className={classes?.className}
+                    />
+                </Modal>
             </div>
             <Modal.Root opened={pdfModalOpen} onClose={() => (setPdfModalOpen(false), setPageNumber(1))} size="600" centered>
                 <Modal.Overlay />
