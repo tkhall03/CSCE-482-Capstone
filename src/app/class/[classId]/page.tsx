@@ -42,6 +42,25 @@ interface Task{
     TaskDescription: string
 }
 
+interface Task { 
+    taskId: number,
+    taskCode: string,
+    description: string,
+    nvicCode: string
+}
+interface Nvic { 
+    nvicId: number,
+    nvicDescription: string,
+    nvicCode: string,
+    tasks: Task[]
+}
+
+interface STCW { 
+    stcwDescription: string
+    stcwId: number,
+    stcwCode: string,
+    nvics: Nvic[]
+}
 
 interface DocType {
     docTypeId: number,
@@ -75,6 +94,25 @@ export default function classList(){
         });
         setdocTypes(fetchedDocTypes);
 
+    }
+
+    async function fetchTaskData(classId: number){
+        let response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
+        let data = await response.json()
+        const fetchedTasks: Task[] = [];
+
+        data.forEach((stcw: STCW) => {
+            stcw.nvics.forEach((nvic: Nvic) => {
+                nvic.tasks.forEach((task: Task) => {
+                    // console.log(task);
+                    fetchedTasks.push({
+                        ...task,
+                        nvicCode: nvic.nvicCode
+                    });
+                });
+            });
+        });
+        setTasks(fetchedTasks);
     }
 
 
