@@ -12,7 +12,8 @@ interface Task {
     taskId: number,
     taskCode: string,
     description: string,
-    nvicCode: string
+    nvicCode: string,
+    nvicDescription: string
 }
 interface Nvic { 
     nvicId: number,
@@ -36,6 +37,7 @@ interface UploadDocumentProps{
     classId?: number | null;
     className?: string | null;
     docTypes: DocType[];
+    tasks: Task[];
 }
 export default function UploadDoc({
     classId,
@@ -53,10 +55,10 @@ export default function UploadDoc({
         data.forEach((stcw: STCW) => {
             stcw.nvics.forEach((nvic: Nvic) => {
                 nvic.tasks.forEach((task: Task) => {
-                    // console.log(task);
                     fetchedTasks.push({
                         ...task,
-                        nvicCode: nvic.nvicCode
+                        nvicCode: nvic.nvicCode,
+                        nvicDescription: nvic.nvicDescription
                     });
                 });
             });
