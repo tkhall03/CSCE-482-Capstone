@@ -11,6 +11,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.m
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import UploadDoc from "@/app/components/UploadDoc";
+import TasksView from "@/app/components/TasksView";
 
 interface ClassData{
     classId: number,
@@ -36,17 +37,12 @@ interface DocumentProp{
     tasks: Task[]
 }
 
-interface Task{
-    TaskPK: number,
-    TaskNum: string,
-    TaskDescription: string
-}
-
 interface Task { 
     taskId: number,
     taskCode: string,
     description: string,
-    nvicCode: string
+    nvicCode: string,
+    nvicDescription: string
 }
 interface Nvic { 
     nvicId: number,
@@ -70,7 +66,8 @@ interface DocType {
 export default function classList(){
 
     const params = useParams();
-
+    
+    const [tasks, setTasks] = useState<Task[]>([]);
     const [docTypes, setdocTypes] = useState<DocType[]>([]);
     const [documents, setDocuments] = useState<DocumentProp[]>([]);
     const [classes, setClasses] = useState<ClassData>();
@@ -81,9 +78,12 @@ export default function classList(){
     const [openFileName, setOpenFileName] = useState<string>('test.pdf');
 
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [isTaskViewModalOpen, setTaskViewModalOpen] = useState(false);
 
     const handleUploadOpenModal = () => setIsUploadModalOpen(true);
     const handleUploadCloseModal = () => setIsUploadModalOpen(false);
+    const handleTaskOpenModal = () => setTaskViewModalOpen(true);
+    const handleTaskCloseModal = () => setTaskViewModalOpen(false);
 
     async function fetchDocTypes(){
         let response = await fetch(`https://localhost:7096/api/Documents/types`)
@@ -96,7 +96,9 @@ export default function classList(){
 
     }
 
+    
     async function fetchTaskData(classId: number){
+        console.log("Fetching tasks");
         let response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
         let data = await response.json()
         const fetchedTasks: Task[] = [];
@@ -104,16 +106,17 @@ export default function classList(){
         data.forEach((stcw: STCW) => {
             stcw.nvics.forEach((nvic: Nvic) => {
                 nvic.tasks.forEach((task: Task) => {
-                    // console.log(task);
                     fetchedTasks.push({
                         ...task,
-                        nvicCode: nvic.nvicCode
+                        nvicCode: nvic.nvicCode,
+                        nvicDescription: nvic.nvicDescription
                     });
                 });
             });
         });
         setTasks(fetchedTasks);
     }
+
 
 
     async function fetchClassData(classId: number){
@@ -138,7 +141,8 @@ export default function classList(){
 
     useEffect(() => {
         if(params){
-            fetchClassData(params?.classId)
+            fetchClassData(params?.classId);
+            fetchTaskData(params?.classId);
         }
         fetchDocTypes();
     }, [params])
@@ -232,7 +236,7 @@ export default function classList(){
                 <div className="text-3xl ml-16 h-full flex">
                     {
                         classes?.deptNo == 1 ?
-                            <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4">
+                            <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4" onClick={handleTaskOpenModal}>
                                 View Tasks
                             </button>
                         :
@@ -311,7 +315,17 @@ export default function classList(){
                         classId={classes?.classId} 
                         className={classes?.className}
                         docTypes={docTypes}
+                        tasks={tasks}
                     />
+                </Modal>
+                <Modal 
+                    opened={isTaskViewModalOpen} 
+                    onClose={handleTaskCloseModal} 
+                    title="View Tasks"
+                    size="lg" 
+                >
+                    
+                    <TasksView tasks={tasks} />
                 </Modal>
             </div>
             <Modal.Root opened={pdfModalOpen} onClose={() => (setPdfModalOpen(false), setPageNumber(1))} size="600" centered>
