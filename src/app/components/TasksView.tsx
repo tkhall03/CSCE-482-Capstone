@@ -1,4 +1,4 @@
-import { Group, Text, rem, Card, Stack } from '@mantine/core';
+import { Text, Card, Stack } from '@mantine/core';
 
 interface Task { 
     taskId: number;

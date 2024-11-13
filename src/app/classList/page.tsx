@@ -6,7 +6,6 @@ import Wrapper from "../components/Wrapper";
 import { useState, useEffect } from 'react'
 import { Divider } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 interface Section{
@@ -35,7 +34,7 @@ interface ClassList{
 }
 
 
-export default function classList(){
+export default function ClassList(){
     
     const router = useRouter();
 

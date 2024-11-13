@@ -63,7 +63,7 @@ interface DocType {
     type: string
 }
 
-export default function classList(){
+export default function ClassList(){
 
     const params = useParams();
     
@@ -173,6 +173,7 @@ export default function classList(){
             </Document>
         </div>
     ));
+    PdfComponent.displayName = "PdfComponent";
 
     function handleButtonForward(isForward: boolean){
         if(isForward && pageNumber != numPages){
@@ -284,7 +285,7 @@ export default function classList(){
             <div className="h-full">
                 {
                     documents.map((doc, idx) => (
-                        <button className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(doc.documentID), setPdfModalOpen(true), setOpenFileName(doc.fileName))}>
+                        <button key={idx} className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(doc.documentID), setPdfModalOpen(true), setOpenFileName(doc.fileName))}>
                             <div key={idx} className={"flex w-screen h-full m-auto text-aggie-maroon p-1 text-lg"}>
                                 <div className="ml-4 w-1/3 my-auto">
                                     {doc.fileName}
