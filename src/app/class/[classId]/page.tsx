@@ -10,6 +10,8 @@ import { useParams } from 'next/navigation'
 pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import UploadDoc from "@/app/components/UploadDoc";
+import TasksView from "@/app/components/TasksView";
 
 interface ClassData{
     classId: number,
@@ -35,16 +37,38 @@ interface DocumentProp{
     tasks: Task[]
 }
 
-interface Task{
-    TaskPK: number,
-    TaskNum: string,
-    TaskDescription: string
+interface Task { 
+    taskId: number,
+    taskCode: string,
+    description: string,
+    nvicCode: string,
+    nvicDescription: string
+}
+interface Nvic { 
+    nvicId: number,
+    nvicDescription: string,
+    nvicCode: string,
+    tasks: Task[]
+}
+
+interface STCW { 
+    stcwDescription: string
+    stcwId: number,
+    stcwCode: string,
+    nvics: Nvic[]
+}
+
+interface DocType {
+    docTypeId: number,
+    type: string
 }
 
 export default function classList(){
 
     const params = useParams();
-
+    
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [docTypes, setdocTypes] = useState<DocType[]>([]);
     const [documents, setDocuments] = useState<DocumentProp[]>([]);
     const [classes, setClasses] = useState<ClassData>();
     const [documentBlob, setDocumentBlob] = useState<string>('');
@@ -53,8 +77,51 @@ export default function classList(){
     const [numPages, setNumPages] = useState<number>(0);
     const [openFileName, setOpenFileName] = useState<string>('test.pdf');
 
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [isTaskViewModalOpen, setTaskViewModalOpen] = useState(false);
+
+    const handleUploadOpenModal = () => setIsUploadModalOpen(true);
+    const handleUploadCloseModal = () => setIsUploadModalOpen(false);
+    const handleTaskOpenModal = () => setTaskViewModalOpen(true);
+    const handleTaskCloseModal = () => setTaskViewModalOpen(false);
+
+    async function fetchDocTypes(){
+        let response = await fetch(`https://localhost:7096/api/Documents/types`)
+        let data = await response.json() 
+        const fetchedDocTypes: DocType[] = [];
+        data.forEach((docType: DocType) => {
+            fetchedDocTypes.push(docType)
+        });
+        console.log(fetchedDocTypes);
+        setdocTypes(fetchedDocTypes);
+
+    }
+
+    
+    async function fetchTaskData(classId: number){
+        console.log("Fetching tasks");
+        let response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
+        let data = await response.json()
+        const fetchedTasks: Task[] = [];
+
+        data.forEach((stcw: STCW) => {
+            stcw.nvics.forEach((nvic: Nvic) => {
+                nvic.tasks.forEach((task: Task) => {
+                    fetchedTasks.push({
+                        ...task,
+                        nvicCode: nvic.nvicCode,
+                        nvicDescription: nvic.nvicDescription
+                    });
+                });
+            });
+        });
+        setTasks(fetchedTasks);
+    }
+
+
+
     async function fetchClassData(classId: number){
-        let response = await fetch(`http://localhost:5248/classes/${classId}`)
+        let response = await fetch(`https://localhost:7096/classes/${classId}`)
         let data = await response.json()
         console.log(data)
         setClasses(data)
@@ -62,7 +129,7 @@ export default function classList(){
     }
 
     async function fetchPdf(documentNum: number){
-        let response = await fetch(`http://localhost:5248/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
+        let response = await fetch(`https://localhost:7096/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
         let file = await response.blob();
         let reader = new FileReader();
         reader.readAsDataURL(file);
@@ -75,8 +142,10 @@ export default function classList(){
 
     useEffect(() => {
         if(params){
-            fetchClassData(params?.classId)
+            fetchClassData(params?.classId);
+            fetchTaskData(params?.classId);
         }
+        fetchDocTypes();
     }, [params])
 
     // when document loaded sets total number of pages of the document
@@ -168,7 +237,7 @@ export default function classList(){
                 <div className="text-3xl ml-16 h-full flex">
                     {
                         classes?.deptNo == 1 ?
-                            <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4">
+                            <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4" onClick={handleTaskOpenModal}>
                                 View Tasks
                             </button>
                         :
@@ -228,9 +297,37 @@ export default function classList(){
                 }
             </div>
             <div className="h-32 bg-aggie-maroon flex text-white text-2xl font-bold">
-                <button className="ml-8 my-auto border-4 rounded-xl h-3/5 w-64">
+                <button 
+                    className="ml-8 my-auto border-4 rounded-xl h-3/5 w-64"
+                    onClick={handleUploadOpenModal}
+                >
                     Upload Document
                 </button>
+
+                {/* Modal component */}
+                <Modal 
+                    opened={isUploadModalOpen} 
+                    onClose={handleUploadCloseModal} 
+                    title="Upload Document"
+                    size="lg" 
+                >
+                    
+                    <UploadDoc 
+                        classId={classes?.classId} 
+                        className={classes?.className}
+                        docTypes={docTypes}
+                        tasks={tasks}
+                    />
+                </Modal>
+                <Modal 
+                    opened={isTaskViewModalOpen} 
+                    onClose={handleTaskCloseModal} 
+                    title="View Tasks"
+                    size="lg" 
+                >
+                    
+                    <TasksView tasks={tasks} />
+                </Modal>
             </div>
             <Modal.Root opened={pdfModalOpen} onClose={() => (setPdfModalOpen(false), setPageNumber(1))} size="600" centered>
                 <Modal.Overlay />

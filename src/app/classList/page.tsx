@@ -5,7 +5,6 @@ import Wrapper from "../components/Wrapper";
 
 import { useState, useEffect } from 'react'
 import { Divider } from '@mantine/core';
-import { DIVIDER_SIZES } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -43,7 +42,7 @@ export default function classList(){
     const [classes, setClasses] = useState<ClassList[]>([]);
 
     async function fetchClasses(){
-        let response = await fetch('http://localhost:5248/persons/1/getClasses')
+        let response = await fetch('https://localhost:7096/persons/getClasses/1');
         let data = await response.json()
         setClasses(data)
     }
