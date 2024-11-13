@@ -1,6 +1,3 @@
-'use client'
-
-import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { MultiSelect, TextInput, Select, Card } from '@mantine/core';
 import { IconUpload, IconPhoto, IconX } from '@tabler/icons-react';
@@ -15,19 +12,20 @@ interface Task {
     nvicCode: string,
     nvicDescription: string
 }
-interface Nvic { 
-    nvicId: number,
-    nvicDescription: string,
-    nvicCode: string,
-    tasks: Task[]
-}
 
-interface STCW { 
-    stcwDescription: string
-    stcwId: number,
-    stcwCode: string,
-    nvics: Nvic[]
-}
+// interface Nvic { 
+//     nvicId: number,
+//     nvicDescription: string,
+//     nvicCode: string,
+//     tasks: Task[]
+// }
+
+// interface STCW { 
+//     stcwDescription: string
+//     stcwId: number,
+//     stcwCode: string,
+//     nvics: Nvic[]
+// }
 
 interface DocType {
     docTypeId: number,
@@ -40,6 +38,14 @@ interface UploadDocumentProps{
     tasks: Task[];
     onClose: () => void;
 }
+
+interface FormDataProps {
+    files: FileList;
+    docType: string;
+    docRemarks: string;
+    tasks?: number[];
+}
+
 export default function UploadDoc({
     classId,
     className,
@@ -50,10 +56,10 @@ export default function UploadDoc({
     const uniqueTasks = Array.from(new Map(tasks.map(task => [task.taskId, task])).values());
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
     const currentDocType = watch("docType");
-    const currentTasks = watch("tasks");
+    // const currentTasks = watch("tasks");
     const uploadedFile = watch("files");
 
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: FormDataProps) => {
         try {
             const formData = new FormData();
             formData.append("file", data.files[0]);

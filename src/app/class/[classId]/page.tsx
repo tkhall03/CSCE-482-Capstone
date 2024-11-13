@@ -86,8 +86,8 @@ export default function classList(){
     const handleTaskCloseModal = () => setTaskViewModalOpen(false);
 
     async function fetchDocTypes(){
-        let response = await fetch(`https://localhost:7096/api/Documents/types`)
-        let data = await response.json() 
+        const response = await fetch(`https://localhost:7096/api/Documents/types`)
+        const data = await response.json() 
         const fetchedDocTypes: DocType[] = [];
         data.forEach((docType: DocType) => {
             fetchedDocTypes.push(docType)
@@ -100,8 +100,8 @@ export default function classList(){
     
     async function fetchTaskData(classId: number){
         console.log("Fetching tasks");
-        let response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
-        let data = await response.json()
+        const response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
+        const data = await response.json()
         const fetchedTasks: Task[] = [];
 
         data.forEach((stcw: STCW) => {
@@ -121,17 +121,17 @@ export default function classList(){
 
 
     async function fetchClassData(classId: number){
-        let response = await fetch(`https://localhost:7096/classes/${classId}`)
-        let data = await response.json()
+        const response = await fetch(`https://localhost:7096/classes/${classId}`)
+        const data = await response.json()
         console.log(data)
         setClasses(data)
         setDocuments(data.documents)
     }
 
     async function fetchPdf(documentNum: number){
-        let response = await fetch(`https://localhost:7096/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
-        let file = await response.blob();
-        let reader = new FileReader();
+        const response = await fetch(`https://localhost:7096/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
+        const file = await response.blob();
+        const reader = new FileReader();
         reader.readAsDataURL(file);
         let base64String;
         reader.onloadend = () => {
