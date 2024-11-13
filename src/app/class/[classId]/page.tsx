@@ -136,20 +136,33 @@ export default function classList(){
         let base64String;
         reader.onloadend = () => {
             base64String = reader.result;
-            setDocumentBlob(base64String.substr(base64String.indexOf(',') + 1));
+            if (base64String) {
+                setDocumentBlob((base64String as string)?.substr((base64String as string).indexOf(',') + 1) ?? '');
+
+            } else {
+                setDocumentBlob(''); 
+            }
+            
         };
     }
 
     useEffect(() => {
-        if(params){
-            fetchClassData(params?.classId);
-            fetchTaskData(params?.classId);
+        if (params) {
+            const classId = Array.isArray(params.classId) ? params.classId[0] : params.classId;
+            const parsedClassId = Number(classId);
+    
+            if (!isNaN(parsedClassId)) {
+                fetchClassData(parsedClassId);
+                fetchTaskData(parsedClassId);
+            } else {
+                console.error("classId is not a valid number");
+            }
         }
         fetchDocTypes();
-    }, [params])
+    }, [params]);
 
     // when document loaded sets total number of pages of the document
-    const handlePDFLoadSuccess = ({ numPages }) => {
+    const handlePDFLoadSuccess = ({ numPages }: {numPages: number}) => {
         setNumPages(numPages);
     };
 
@@ -342,7 +355,7 @@ export default function classList(){
                     </Modal.Header>
                     <Modal.Body>
                         <HoverCard shadow="md" offset={-screen.height * .1} disabled={numPages === 0}>
-                            <HoverCard.Target className='h-full'>
+                            <HoverCard.Target>
                                 <PdfComponent/>
                             </HoverCard.Target>
                             <HoverCard.Dropdown className='flex place-items-center !py-2 !px-0'>

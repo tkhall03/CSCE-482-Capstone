@@ -100,7 +100,9 @@ export default function classList(){
                                             <Wrapper label={termClass.catalogName} className="m-2 bg-inherit " disabled={!term.status}>
                                                 {
                                                     termClass.classes.map((classSection, i) => (
-                                                            <button key={i} className={`z-10 mx-10 font-bold border-4 rounded-xl ${term.status ? "border-aggie-maroon text-aggie-maroon" : "border-fadded-aggie-maroon text-fadded-aggie-maroon" }`} onClick={() => router.push(`/class/${classSection.classId}`, { classId: `${classSection.classId}` })}>
+                                                            <button key={i} className={`z-10 mx-10 font-bold border-4 rounded-xl ${term.status ? "border-aggie-maroon text-aggie-maroon" : "border-fadded-aggie-maroon text-fadded-aggie-maroon" }`} 
+                                                                onClick={() => router.push(`/class/${classSection.classId}`)}
+                                                                            >
                                                                 <div className="flex flex-col p-2">
                                                                     <div>Section: {classSection.sectionNumber}</div>
                                                                     {getStatusTasks(classSection, termClass.designation, classSection.taskRequired, term.status)}
