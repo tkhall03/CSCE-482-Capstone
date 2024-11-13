@@ -92,6 +92,7 @@ export default function classList(){
         data.forEach((docType: DocType) => {
             fetchedDocTypes.push(docType)
         });
+        console.log(fetchedDocTypes);
         setdocTypes(fetchedDocTypes);
 
     }

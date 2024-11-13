@@ -42,44 +42,18 @@ interface UploadDocumentProps{
 export default function UploadDoc({
     classId,
     className,
-    docTypes
+    docTypes,
+    tasks
 }: UploadDocumentProps) {
 
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const uniqueTasks = Array.from(new Map(tasks.map(task => [task.taskId, task])).values());
     // const [docTypes, setdocTypes] = useState<DocType[]>([]);
-    async function fetchTaskData(classId: number){
-        let response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
-        let data = await response.json()
-        const fetchedTasks: Task[] = [];
-
-        data.forEach((stcw: STCW) => {
-            stcw.nvics.forEach((nvic: Nvic) => {
-                nvic.tasks.forEach((task: Task) => {
-                    fetchedTasks.push({
-                        ...task,
-                        nvicCode: nvic.nvicCode,
-                        nvicDescription: nvic.nvicDescription
-                    });
-                });
-            });
-        });
-        setTasks(fetchedTasks);
-    }
-
-
-
-    useEffect(() => {
-        if (typeof classId === "number") {
-            fetchTaskData(classId);
-        }
-    }, []);
-
 
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
     const currentDocRemarks = watch("docRemarks");
     const currentDocType = watch("docType");
     const currentTasks = watch("tasks");
-    const [docType, setDocType] = useState<number>();
+    // const [docType, setDocType] = useState<number>();
     const onSubmit = async (data: any) => {
         try {
             const formData = new FormData();
@@ -156,6 +130,7 @@ export default function UploadDoc({
                     </Dropzone>
                     <input type="hidden" {...register("files", { required: true })} />
                     {errors.files && <Text color="red">Files are required.</Text>}
+                    
 
                     <Select
                         label="Document Type"
@@ -166,9 +141,9 @@ export default function UploadDoc({
                         }))}
                         {...register("docType", { required: true })}
                         onChange={(value) => {
+                            console.log(value);
                             setValue("docType", value);
                         }}
-                        
                     />
 
                     <TextInput 
@@ -178,21 +153,26 @@ export default function UploadDoc({
                         onChange={(e) => setValue("docRemarks", e.currentTarget.value)}
                     />
                     
-                    { currentDocType == 1 &&  (
-                        <MultiSelect
-                        label={`Tasks for ${className}`}
-                        placeholder="Pick tasks this document supports"
-                        data={tasks.map((task) => ({
-                            label: `Task: ${task.taskCode} - Nvic: ${task.nvicCode}`,
-                            value: task.taskId.toString(),
-                        }))}
-                        {...register("tasks")} 
-                        onChange={(selectedValues) => {
-                            setValue("tasks", selectedValues)
-                            console.log(currentTasks);
-                        }}
-                        />
+                    { currentDocType == 1 && (
+                        <>
+                            
+
+                            <MultiSelect
+                                label={`Tasks for ${className}`}
+                                placeholder="Pick tasks this document supports"
+                                data={uniqueTasks.map((task) => ({
+                                    label: `Task: ${task.taskCode} - Nvic: ${task.nvicCode}`,
+                                    value: task.taskId.toString(),
+                                }))}
+                                {...register("tasks")} 
+                                onChange={(selectedValues) => {
+                                    setValue("tasks", selectedValues)
+                                    console.log(currentTasks);
+                                }}
+                            />
+                        </>
                     )}
+
 
                 <button  className="mt-4 border-2 border-aggie-maroon rounded-md" type="submit">Submit</button>
                 
