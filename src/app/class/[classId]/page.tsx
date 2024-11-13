@@ -304,7 +304,6 @@ export default function classList(){
                     Upload Document
                 </button>
 
-                {/* Modal component */}
                 <Modal 
                     opened={isUploadModalOpen} 
                     onClose={handleUploadCloseModal} 
@@ -317,6 +316,7 @@ export default function classList(){
                         className={classes?.className}
                         docTypes={docTypes}
                         tasks={tasks}
+                        onClose={handleUploadCloseModal}
                     />
                 </Modal>
                 <Modal 

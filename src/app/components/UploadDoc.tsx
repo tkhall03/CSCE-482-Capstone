@@ -38,12 +38,14 @@ interface UploadDocumentProps{
     className?: string | null;
     docTypes: DocType[];
     tasks: Task[];
+    onClose: () => void;
 }
 export default function UploadDoc({
     classId,
     className,
     docTypes,
-    tasks
+    tasks,
+    onClose
 }: UploadDocumentProps) {
     const uniqueTasks = Array.from(new Map(tasks.map(task => [task.taskId, task])).values());
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
@@ -59,9 +61,11 @@ export default function UploadDoc({
             formData.append("classId", (classId?.toString() ?? ""));
             formData.append("docType", data.docType);
             formData.append("remark", data.docRemarks);
-            data.tasks.forEach((taskId: number) => {
-                formData.append("taskIds", taskId.toString());
-            });
+            if (data.tasks) {
+                data.tasks.forEach((taskId: number) => {
+                    formData.append("taskIds", taskId.toString());
+                });
+            }
 
             const response = await fetch("https://localhost:7096/api/Documents/upload", {
                 method: "POST",
@@ -70,6 +74,7 @@ export default function UploadDoc({
 
             if (response.ok) {
                 console.log("Form submitted successfully");
+                onClose();
             } else {
                 console.error("Error submitting form");
             }
