@@ -124,7 +124,8 @@ export default function UploadDoc({
                         styles={{
                             root: {
                                 width: '100%', 
-                                borderColor: '#0F5F0F',
+                                backgroundColor: '#e6ffe6', // Light green background color
+                                borderColor: '#90EE90',
                                 borderWidth: '2px',
                                 borderStyle: 'solid',
                                 display: 'flex',
