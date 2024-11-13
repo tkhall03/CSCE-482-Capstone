@@ -63,7 +63,7 @@ interface DocType {
     type: string
 }
 
-export default function classList(){
+export default function ClassList(){
 
     const params = useParams();
     
@@ -86,8 +86,8 @@ export default function classList(){
     const handleTaskCloseModal = () => setTaskViewModalOpen(false);
 
     async function fetchDocTypes(){
-        let response = await fetch(`https://localhost:7096/api/Documents/types`)
-        let data = await response.json() 
+        const response = await fetch(`https://localhost:7096/api/Documents/types`)
+        const data = await response.json() 
         const fetchedDocTypes: DocType[] = [];
         data.forEach((docType: DocType) => {
             fetchedDocTypes.push(docType)
@@ -100,8 +100,8 @@ export default function classList(){
     
     async function fetchTaskData(classId: number){
         console.log("Fetching tasks");
-        let response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
-        let data = await response.json()
+        const response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
+        const data = await response.json()
         const fetchedTasks: Task[] = [];
 
         data.forEach((stcw: STCW) => {
@@ -121,17 +121,17 @@ export default function classList(){
 
 
     async function fetchClassData(classId: number){
-        let response = await fetch(`https://localhost:7096/classes/${classId}`)
-        let data = await response.json()
+        const response = await fetch(`https://localhost:7096/classes/${classId}`)
+        const data = await response.json()
         console.log(data)
         setClasses(data)
         setDocuments(data.documents)
     }
 
     async function fetchPdf(documentNum: number){
-        let response = await fetch(`https://localhost:7096/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
-        let file = await response.blob();
-        let reader = new FileReader();
+        const response = await fetch(`https://localhost:7096/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
+        const file = await response.blob();
+        const reader = new FileReader();
         reader.readAsDataURL(file);
         let base64String;
         reader.onloadend = () => {
@@ -173,6 +173,7 @@ export default function classList(){
             </Document>
         </div>
     ));
+    PdfComponent.displayName = "PdfComponent";
 
     function handleButtonForward(isForward: boolean){
         if(isForward && pageNumber != numPages){
@@ -284,7 +285,7 @@ export default function classList(){
             <div className="h-full">
                 {
                     documents.map((doc, idx) => (
-                        <button className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(doc.documentID), setPdfModalOpen(true), setOpenFileName(doc.fileName))}>
+                        <button key={idx} className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(doc.documentID), setPdfModalOpen(true), setOpenFileName(doc.fileName))}>
                             <div key={idx} className={"flex w-screen h-full m-auto text-aggie-maroon p-1 text-lg"}>
                                 <div className="ml-4 w-1/3 my-auto">
                                     {doc.fileName}

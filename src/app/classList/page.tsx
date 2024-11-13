@@ -6,7 +6,6 @@ import Wrapper from "../components/Wrapper";
 import { useState, useEffect } from 'react'
 import { Divider } from '@mantine/core';
 import { IconAlertTriangleFilled } from '@tabler/icons-react';
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 interface Section{
@@ -35,15 +34,15 @@ interface ClassList{
 }
 
 
-export default function classList(){
+export default function ClassList(){
     
     const router = useRouter();
 
     const [classes, setClasses] = useState<ClassList[]>([]);
 
     async function fetchClasses(){
-        let response = await fetch('https://localhost:7096/persons/getClasses/1');
-        let data = await response.json()
+        const response = await fetch('https://localhost:7096/persons/getClasses/1');
+        const data = await response.json()
         setClasses(data)
     }
 
@@ -53,8 +52,8 @@ export default function classList(){
 
     function getStatusTasks(classSection: Section, designation: number, numTaskRequired: number, active: boolean){
 
-        let numStatusComplete = classSection.sampleTestDOA + classSection.attendance + classSection.syllabus
-        let numTaskComplete = classSection.taskCompleted
+        const numStatusComplete = classSection.sampleTestDOA + classSection.attendance + classSection.syllabus
+        const numTaskComplete = classSection.taskCompleted
 
         return(
             <div className="flex">
