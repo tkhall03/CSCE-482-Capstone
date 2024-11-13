@@ -7,11 +7,13 @@ import { Divider, Modal, HoverCard, TextInput } from '@mantine/core';
 import { IconAlertTriangleFilled, IconDotsVertical, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useParams } from 'next/navigation'
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
-import UploadDoc from "@/app/components/UploadDoc";
-import TasksView from "@/app/components/TasksView";
+import UploadDoc from "../../components/UploadDoc";
+import TasksView from "../../components/TasksView";
 
 interface ClassData{
     classId: number,
