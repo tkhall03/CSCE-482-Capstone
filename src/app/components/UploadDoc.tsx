@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { MultiSelect, TextInput, Select } from '@mantine/core';
+import { MultiSelect, TextInput, Select, Card } from '@mantine/core';
 import { IconUpload, IconPhoto, IconX } from '@tabler/icons-react';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { Group, Text, rem } from '@mantine/core';
@@ -45,15 +45,12 @@ export default function UploadDoc({
     docTypes,
     tasks
 }: UploadDocumentProps) {
-
     const uniqueTasks = Array.from(new Map(tasks.map(task => [task.taskId, task])).values());
-    // const [docTypes, setdocTypes] = useState<DocType[]>([]);
-
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
-    const currentDocRemarks = watch("docRemarks");
     const currentDocType = watch("docType");
     const currentTasks = watch("tasks");
-    // const [docType, setDocType] = useState<number>();
+    const uploadedFile = watch("files");
+
     const onSubmit = async (data: any) => {
         try {
             const formData = new FormData();
@@ -65,12 +62,12 @@ export default function UploadDoc({
             data.tasks.forEach((taskId: number) => {
                 formData.append("taskIds", taskId.toString());
             });
-    
+
             const response = await fetch("https://localhost:7096/api/Documents/upload", {
                 method: "POST",
                 body: formData,
             });
-    
+
             if (response.ok) {
                 console.log("Form submitted successfully");
             } else {
@@ -80,11 +77,11 @@ export default function UploadDoc({
             console.error("Submission error:", e);
         }
     };
-    return(
-        <div className="bg-white h-screen flex flex-col">
 
-            <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col">
-                    <Dropzone
+    return (
+        <div className="bg-white h-screen flex flex-col p-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col space-y-4">
+                <Dropzone
                     onDrop={(files) => {
                         console.log('accepted files', files);
                         setValue("files", files);                
@@ -97,90 +94,93 @@ export default function UploadDoc({
                         MIME_TYPES.docx,
                         MIME_TYPES.pdf
                     ]}
-                    >
+                >
                     <Group justify="center" gap="xl" mih={220} style={{ pointerEvents: 'none' }}>
                         <Dropzone.Accept>
-                        <IconUpload
-                            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-blue-6)' }}
-                            stroke={1.5}
-                        />
+                            <IconUpload style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-blue-6)' }} stroke={1.5} />
                         </Dropzone.Accept>
                         <Dropzone.Reject>
-                        <IconX
-                            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-red-6)' }}
-                            stroke={1.5}
-                        />
+                            <IconX style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-red-6)' }} stroke={1.5} />
                         </Dropzone.Reject>
                         <Dropzone.Idle>
-                        <IconPhoto
-                            style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-dimmed)' }}
-                            stroke={1.5}
-                        />
+                            <IconPhoto style={{ width: rem(52), height: rem(52), color: 'var(--mantine-color-dimmed)' }} stroke={1.5} />
                         </Dropzone.Idle>
-
                         <div>
-                        <Text size="xl" inline>
-                            Drag documents here or select a documet to upload
-                        </Text>
-                        <Text size="sm" c="dimmed" inline mt={7}>
-                            Attach your documents here
-                        </Text>
+                            <Text size="xl" inline>
+                                Drag documents here or select a document to upload
+                            </Text>
+                            <Text size="sm" c="dimmed" inline mt={7}>
+                                Attach your documents here
+                            </Text>
                         </div>
                     </Group>
-                    </Dropzone>
-                    <input type="hidden" {...register("files", { required: true })} />
-                    {errors.files && <Text color="red">Files are required.</Text>}
-                    
+                </Dropzone>
 
-                    <Select
-                        label="Document Type"
-                        placeholder="Pick document type"
-                        data={docTypes.map((dt) => ({
-                            label: `${dt.type}`,
-                            value: dt.docTypeId.toString()
-                        }))}
-                        {...register("docType", { required: true })}
-                        onChange={(value) => {
-                            console.log(value);
-                            setValue("docType", value);
+                {uploadedFile && uploadedFile[0] && (
+                    <Card 
+                        shadow="sm" 
+                        padding="lg" 
+                        withBorder
+                        styles={{
+                            root: {
+                                width: '100%', 
+                                borderColor: '#0F5F0F',
+                                borderWidth: '2px',
+                                borderStyle: 'solid',
+                                display: 'flex',
+                                justifyContent: 'flex-start',
+                                padding: '20px',
+                                marginTop: '10px',
+                            },
                         }}
-                    />
+                    >
+                        <Text size="lg" inline>
+                            {uploadedFile[0].name}
+                        </Text>
+                    </Card>
+                )}
 
-                    <TextInput 
-                        label="Document Remarks" 
-                        placeholder="Type remarks here" 
-                        {...register("docRemarks", {required: true})}
-                        onChange={(e) => setValue("docRemarks", e.currentTarget.value)}
-                    />
-                    
-                    { currentDocType == 1 && (
-                        <>
-                            
+                <input type="hidden" {...register("files", { required: true })} />
+                {errors.files && <Text color="red">Files are required.</Text>}
 
-                            <MultiSelect
-                                label={`Tasks for ${className}`}
-                                placeholder="Pick tasks this document supports"
-                                data={uniqueTasks.map((task) => ({
-                                    label: `Task: ${task.taskCode} - Nvic: ${task.nvicCode}`,
-                                    value: task.taskId.toString(),
-                                }))}
-                                {...register("tasks")} 
-                                onChange={(selectedValues) => {
-                                    setValue("tasks", selectedValues)
-                                    console.log(currentTasks);
-                                }}
-                            />
-                        </>
-                    )}
+                <Select
+                    label="Document Type"
+                    placeholder="Pick document type"
+                    data={docTypes.map((dt) => ({
+                        label: `${dt.type}`,
+                        value: dt.docTypeId.toString()
+                    }))}
+                    {...register("docType", { required: true })}
+                    onChange={(value) => setValue("docType", value)}
+                />
 
-
-                <button  className="mt-4 border-2 border-aggie-maroon rounded-md" type="submit">Submit</button>
+                <TextInput 
+                    label="Document Remarks" 
+                    placeholder="Type remarks here" 
+                    {...register("docRemarks", { required: true })}
+                    onChange={(e) => setValue("docRemarks", e.currentTarget.value)}
+                />
                 
+                {currentDocType == 1 && (
+                    <MultiSelect
+                        label={`Tasks for ${className}`}
+                        placeholder="Pick tasks this document supports"
+                        data={uniqueTasks.map((task) => ({
+                            label: `Task: ${task.taskCode} - Nvic: ${task.nvicCode}`,
+                            value: task.taskId.toString(),
+                        }))}
+                        {...register("tasks")} 
+                        onChange={(selectedValues) => setValue("tasks", selectedValues)}
+                    />
+                )}
 
-
-                </form>
+                <button 
+                    className="mt-4 px-4 py-2 bg-aggie-maroon text-white rounded-md border-2 border-aggie-maroon hover:bg-white hover:text-aggie-maroon transition-colors"
+                    type="submit"
+                >
+                    Submit
+                </button>
+            </form>
         </div>
-        
     );
-    
 }
