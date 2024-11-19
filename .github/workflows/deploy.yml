@@ -21,15 +21,13 @@ jobs:
       - name: Test SSH Connection
         run: |
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
-          
-          ls
 
-          docker ps - a
+          docker ps -a
 
           docker stop capstone-frontend || true
           docker rm capstone-frontend || true
 
-          cd /Desktop/Coding/CSCE_481/CSCE-482-Capstone
+          cd Desktop/Coding/CSCE_481/CSCE-482-Capstone
           git pull origin main
 
           docker build --network=host -t capstone-frontend .
