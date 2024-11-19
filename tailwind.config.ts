@@ -13,6 +13,7 @@ const config: Config = {
         foreground: "var(--foreground)",
         'aggie-maroon': '#500000',
         'fadded-aggie-maroon': '#50000066',
+        'darker-aggie-maroon': '#2b0101',
         'ut-orange': '#bf5700',
       },
     },

@@ -1,4 +1,5 @@
 /** @type {import('next').NextConfig} */
+
 const nextConfig = {
     webpack: (config) => {
       config.resolve.alias.canvas = false;
@@ -7,8 +8,11 @@ const nextConfig = {
     },
     experimental: {
         optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
+        // webpackBuildWorker: true,
       },
     // swcMinify: false,
+
+    output: 'standalone',
 };
 
 export default nextConfig;

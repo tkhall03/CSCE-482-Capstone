@@ -7,9 +7,13 @@ import { Divider, Modal, HoverCard, TextInput, Textarea } from '@mantine/core';
 import { IconAlertTriangleFilled, IconDotsVertical, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useParams } from 'next/navigation'
-pdfjs.GlobalWorkerOptions.workerSrc = new URL('pdfjs-dist/build/pdf.worker.min.mjs', import.meta.url).toString();
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+import UploadDoc from "../../components/UploadDoc";
+import TasksView from "../../components/TasksView";
 import moment from 'moment';
 
 interface ClassData{
@@ -36,10 +40,30 @@ interface DocumentProp{
     tasks: Task[]
 }
 
-interface Task{
-    TaskPK: number,
-    TaskNum: string,
-    TaskDescription: string
+interface Task { 
+    taskId: number,
+    taskCode: string,
+    description: string,
+    nvicCode: string,
+    nvicDescription: string
+}
+interface Nvic { 
+    nvicId: number,
+    nvicDescription: string,
+    nvicCode: string,
+    tasks: Task[]
+}
+
+interface STCW { 
+    stcwDescription: string
+    stcwId: number,
+    stcwCode: string,
+    nvics: Nvic[]
+}
+
+interface DocType {
+    docTypeId: number,
+    type: string
 }
 
 interface DocumentInfo{
@@ -59,10 +83,29 @@ interface Remark{
     remarkDate: string
 }
 
-export default function classList(){
+interface DocumentInfo{
+    documentId: number,
+    valid: boolean,
+    voidRemarks: string,
+    voidUser: string,
+    voidDateTime: string,
+    uploadUser: string,
+    uploadDateTime: string,
+    remarks: Remark[]
+}
+
+interface Remark{
+    remark: string,
+    remarkUser: string,
+    remarkDate: string
+}
+
+export default function ClassList(){
 
     const params = useParams();
-
+    
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [docTypes, setdocTypes] = useState<DocType[]>([]);
     const [documents, setDocuments] = useState<DocumentProp[]>([]);
     const [classes, setClasses] = useState<ClassData>();
     const [documentBlob, setDocumentBlob] = useState<string>('');
@@ -75,39 +118,97 @@ export default function classList(){
     const [newRemark, setNewRemark] = useState<string>("");
     const [documentDetails, setDocumentDetails] = useState<DocumentInfo>();
 
+    const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+    const [isTaskViewModalOpen, setTaskViewModalOpen] = useState(false);
+
+    const handleUploadOpenModal = () => setIsUploadModalOpen(true);
+    const handleUploadCloseModal = () => setIsUploadModalOpen(false);
+    const handleTaskOpenModal = () => setTaskViewModalOpen(true);
+    const handleTaskCloseModal = () => setTaskViewModalOpen(false);
+
+    async function fetchDocTypes(){
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/types`)
+        const data = await response.json() 
+        const fetchedDocTypes: DocType[] = [];
+        data.forEach((docType: DocType) => {
+            fetchedDocTypes.push(docType)
+        });
+        console.log(fetchedDocTypes);
+        setdocTypes(fetchedDocTypes);
+
+    }
+
+    
+    async function fetchTaskData(classId: number){
+        console.log("Fetching tasks");
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/api/classes/getTasksForClass/${classId}`)
+        const data = await response.json()
+        const fetchedTasks: Task[] = [];
+
+        data.forEach((stcw: STCW) => {
+            stcw.nvics.forEach((nvic: Nvic) => {
+                nvic.tasks.forEach((task: Task) => {
+                    fetchedTasks.push({
+                        ...task,
+                        nvicCode: nvic.nvicCode,
+                        nvicDescription: nvic.nvicDescription
+                    });
+                });
+            });
+        });
+        setTasks(fetchedTasks);
+    }
+
+
+
     async function fetchClassData(classId: number){
-        let response = await fetch(`http://localhost:5248/classes/${classId}`)
-        let data = await response.json()
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/api/classes/${classId}`)
+        const data = await response.json()
         console.log(data)
         setClasses(data)
         setDocuments(data.documents)
     }
 
     async function fetchPdf(documentNum: number){
-        let response = await fetch(`http://localhost:5248/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
-        let file = await response.blob();
-        let reader = new FileReader();
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
+        const file = await response.blob();
+        const reader = new FileReader();
         reader.readAsDataURL(file);
         let base64String;
         reader.onloadend = () => {
             base64String = reader.result;
-            setDocumentBlob(base64String.substr(base64String.indexOf(',') + 1));
+            if (base64String) {
+                setDocumentBlob((base64String as string)?.substr((base64String as string).indexOf(',') + 1) ?? '');
+
+            } else {
+                setDocumentBlob(''); 
+            }
+            
         };
     }
 
     async function fetchDocumentData(documentId: number){
-        let response = await fetch(`http://localhost:5248/api/Documents/info/${documentId}`);
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/info/${documentId}`);
         setDocumentDetails(await response.json());
     }
 
     useEffect(() => {
-        if(params){
-            fetchClassData(params?.classId)
+        if (params) {
+            const classId = Array.isArray(params.classId) ? params.classId[0] : params.classId;
+            const parsedClassId = Number(classId);
+    
+            if (!isNaN(parsedClassId)) {
+                fetchClassData(parsedClassId);
+                fetchTaskData(parsedClassId);
+            } else {
+                console.error("classId is not a valid number");
+            }
         }
-    }, [params])
+        fetchDocTypes();
+    }, [params]);
 
     // when document loaded sets total number of pages of the document
-    const handlePDFLoadSuccess = ({ numPages }) => {
+    const handlePDFLoadSuccess = ({ numPages }: {numPages: number}) => {
         setNumPages(numPages);
     };
 
@@ -118,6 +219,7 @@ export default function classList(){
             </Document>
         </div>
     ));
+    PdfComponent.displayName = "PdfComponent";
 
     function handleButtonForward(isForward: boolean){
         if(isForward && pageNumber != numPages){
@@ -195,7 +297,7 @@ export default function classList(){
                 <div className="text-3xl ml-16 h-full flex">
                     {
                         classes?.deptNo == 1 ?
-                            <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4">
+                            <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4" onClick={handleTaskOpenModal}>
                                 View Tasks
                             </button>
                         :
@@ -229,7 +331,7 @@ export default function classList(){
             <div className="h-full">
                 {
                     documents.map((doc, idx) => (
-                        <button className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(doc.documentID), setPdfModalOpen(true), setOpenFileName(doc.fileName))}>
+                        <button key={idx} className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(doc.documentID), setPdfModalOpen(true), setOpenFileName(doc.fileName))}>
                             <div key={idx} className={"flex w-screen h-full m-auto text-aggie-maroon p-1 text-lg"}>
                                 <div className="ml-4 w-1/3 my-auto">
                                     {doc.fileName}
@@ -255,9 +357,37 @@ export default function classList(){
                 }
             </div>
             <div className="h-32 bg-aggie-maroon flex text-white text-2xl font-bold">
-                <button className="ml-8 my-auto border-4 rounded-xl h-3/5 w-64">
+                <button 
+                    className="ml-8 my-auto border-4 rounded-xl h-3/5 w-64"
+                    onClick={handleUploadOpenModal}
+                >
                     Upload Document
                 </button>
+
+                <Modal 
+                    opened={isUploadModalOpen} 
+                    onClose={handleUploadCloseModal} 
+                    title="Upload Document"
+                    size="lg" 
+                >
+                    
+                    <UploadDoc 
+                        classId={classes?.classId} 
+                        className={classes?.className}
+                        docTypes={docTypes}
+                        tasks={tasks}
+                        onClose={handleUploadCloseModal}
+                    />
+                </Modal>
+                <Modal 
+                    opened={isTaskViewModalOpen} 
+                    onClose={handleTaskCloseModal} 
+                    title="View Tasks"
+                    size="lg" 
+                >
+                    
+                    <TasksView tasks={tasks} />
+                </Modal>
             </div>
             <Modal.Root opened={pdfModalOpen} onClose={() => (setPdfModalOpen(false), setPageNumber(1))} size="600" centered>
                 <Modal.Overlay />
@@ -272,7 +402,7 @@ export default function classList(){
                     </Modal.Header>
                     <Modal.Body className="!h-[44rem]">
                         <HoverCard shadow="md" offset={-screen.height * .1}>
-                            <HoverCard.Target className='h-full'>
+                            <HoverCard.Target>
                                 <PdfComponent/>
                             </HoverCard.Target>
                             <HoverCard.Dropdown className='flex place-items-center !py-2 !px-0'>
@@ -329,7 +459,7 @@ export default function classList(){
                                 <div className="border-4 border-aggie-maroon rounded-xl py-4 overflow-auto mx-4">
                                     {
                                         documentDetails?.remarks.map((remark, idx) => (
-                                            <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col">
+                                            <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col" key={idx}>
                                                 <div className="mx-auto">
                                                     {remark.remark}
                                                 </div>
