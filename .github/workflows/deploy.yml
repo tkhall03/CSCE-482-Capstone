@@ -24,8 +24,10 @@ jobs:
 
           docker ps -a
 
-          docker stop capstone-frontend || true
-          docker rm capstone-frontend || true
+          docker ps -a --filter "ancestor=capstone-frontend" --format "{{.ID}}" | xargs -r docker stop
+          docker system prune -af
+          
+          docker ps -a
 
           cd Desktop/Coding/CSCE_481/CSCE-482-Capstone
           git pull origin main
