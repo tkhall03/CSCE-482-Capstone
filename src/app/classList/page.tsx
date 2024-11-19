@@ -41,7 +41,7 @@ export default function ClassList(){
     const [classes, setClasses] = useState<ClassList[]>([]);
 
     async function fetchClasses(){
-        const response = await fetch('https://csce482capstone.csce482capstone.me/persons/getClasses/1');
+        const response = await fetch('https://csce482capstone.csce482capstone.me/api/persons/getClasses/1');
         const data = await response.json()
         setClasses(data)
     }
