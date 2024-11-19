@@ -73,7 +73,7 @@ export default function UploadDoc({
                 });
             }
 
-            const response = await fetch("https://localhost:7096/api/Documents/upload", {
+            const response = await fetch("https://csce482capstone.csce482capstone.me/api/Documents/upload", {
                 method: "POST",
                 body: formData,
             });

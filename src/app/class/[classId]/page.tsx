@@ -88,7 +88,7 @@ export default function ClassList(){
     const handleTaskCloseModal = () => setTaskViewModalOpen(false);
 
     async function fetchDocTypes(){
-        const response = await fetch(`https://localhost:7096/api/Documents/types`)
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/types`)
         const data = await response.json() 
         const fetchedDocTypes: DocType[] = [];
         data.forEach((docType: DocType) => {
@@ -102,7 +102,7 @@ export default function ClassList(){
     
     async function fetchTaskData(classId: number){
         console.log("Fetching tasks");
-        const response = await fetch(`https://localhost:7096/classes/getTasksForClass/${classId}`)
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/classes/getTasksForClass/${classId}`)
         const data = await response.json()
         const fetchedTasks: Task[] = [];
 
@@ -123,7 +123,7 @@ export default function ClassList(){
 
 
     async function fetchClassData(classId: number){
-        const response = await fetch(`https://localhost:7096/classes/${classId}`)
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/classes/${classId}`)
         const data = await response.json()
         console.log(data)
         setClasses(data)
@@ -131,7 +131,7 @@ export default function ClassList(){
     }
 
     async function fetchPdf(documentNum: number){
-        const response = await fetch(`https://localhost:7096/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
+        const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
         const file = await response.blob();
         const reader = new FileReader();
         reader.readAsDataURL(file);
