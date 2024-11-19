@@ -22,6 +22,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
           
+          ls
+
+          docker ps - a
+
           docker stop capstone-frontend || true
           docker rm capstone-frontend || true
 
