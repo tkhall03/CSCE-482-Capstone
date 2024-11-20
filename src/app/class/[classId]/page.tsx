@@ -342,7 +342,7 @@ export default function ClassList(){
                     Details
                 </div>
             </div>
-            <div className="w-screen flex mx-auto -mb-2"> {/* Incase chaning divider width */}
+            <div className="w-screen flex mx-auto"> {/* Incase chaning divider width */}
                 <Divider size={6} style={{width:'100%', height: '100%'}} color={'#500000'} className="mb-0"/>
             </div>
             <div className="h-full">
@@ -350,7 +350,7 @@ export default function ClassList(){
                    documents.map((doc, idx) => (
                     <button
                         key={idx}
-                        className={`h-20 text-left w-full ${doc.valid ? '' : 'bg-gray-200 text-gray-500'}`}
+                        className={`h-20 text-left w-full p-0 m-0 flex flex-col ${doc.valid ? '' : 'bg-gray-200 text-gray-500'}`}
                         onDoubleClick={() => {
                             if (doc.valid) {
                                 fetchPdf(doc.documentID);
@@ -361,7 +361,7 @@ export default function ClassList(){
                     >
                         <div
                             key={idx}
-                            className={`flex w-screen h-full m-auto text-aggie-maroon p-1 text-lg ${doc.valid ? '' : 'opacity-50'}`}
+                            className={`flex w-screen h-max my-0 py-0 px-1 text-aggie-maroon text-lg grow ${doc.valid ? '' : 'opacity-50'}`}
                         >
                             <div className="ml-4 w-1/3 my-auto">
                                 {doc.fileName}
@@ -388,15 +388,8 @@ export default function ClassList(){
                                 <IconDotsVertical stroke={3} />
                             </button>
                         </div>
-                        <div className="w-screen flex mx-auto">
-                            <Divider
-                                size={6}
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                }}
-                                color={doc.valid ? '#500000' : '#CCCCCC'}
-                            />
+                        <div className="w-screen h-1.5 m-0 p-0 bg-aggie-maroon">
+                            
                         </div>
                     </button>
                 ))
