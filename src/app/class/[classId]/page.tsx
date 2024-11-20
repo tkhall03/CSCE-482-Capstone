@@ -3,7 +3,7 @@
 import NavBar from "../../components/NavBar";
 
 import { useState, useEffect, forwardRef } from 'react'
-import { Divider, Modal, HoverCard, TextInput, Textarea, Button } from '@mantine/core';
+import { Divider, Modal, HoverCard, TextInput, Textarea } from '@mantine/core';
 import { IconAlertTriangleFilled, IconDotsVertical, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useParams } from 'next/navigation'
@@ -224,8 +224,6 @@ export default function ClassList(){
     }
 
     async function addNewRemark(){
-        documentDetails
-
         if(newRemark.length > 20){
 
             fetch(`https://csce482capstone.csce482capstone.me/api/Documents/addRemark`, {
@@ -508,7 +506,7 @@ export default function ClassList(){
                                 <div className="border-4 border-aggie-maroon rounded-xl py-4 overflow-auto mx-4 max-h-104">
                                     {
                                         documentDetails?.remarks.map((remark, idx) => (
-                                                <div>
+                                                <div key={idx}>
                                                     <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col" key={idx}>
                                                         <div className="mx-auto">
                                                             {remark.remark}
