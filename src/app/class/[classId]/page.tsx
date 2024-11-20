@@ -3,7 +3,7 @@
 import NavBar from "../../components/NavBar";
 
 import { useState, useEffect, forwardRef } from 'react'
-import { Divider, Modal, HoverCard, TextInput, Textarea } from '@mantine/core';
+import { Divider, Modal, HoverCard, TextInput, Textarea, Button } from '@mantine/core';
 import { IconAlertTriangleFilled, IconDotsVertical, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useParams } from 'next/navigation'
@@ -15,6 +15,7 @@ import 'react-pdf/dist/Page/AnnotationLayer.css';
 import UploadDoc from "../../components/UploadDoc";
 import TasksView from "../../components/TasksView";
 import moment from 'moment';
+import VoidDoc from "../../components/VoidDoc";
 
 interface ClassData{
     classId: number,
@@ -83,17 +84,6 @@ interface Remark{
     remarkDate: string
 }
 
-interface DocumentInfo{
-    documentId: number,
-    valid: boolean,
-    voidRemarks: string,
-    voidUser: string,
-    voidDateTime: string,
-    uploadUser: string,
-    uploadDateTime: string,
-    remarks: Remark[]
-}
-
 interface Remark{
     remark: string,
     remarkUser: string,
@@ -120,11 +110,14 @@ export default function ClassList(){
 
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isTaskViewModalOpen, setTaskViewModalOpen] = useState(false);
+    const [isVoidDocModalOpen, setIsVoidDocModalOpen] = useState(false);
 
     const handleUploadOpenModal = () => setIsUploadModalOpen(true);
     const handleUploadCloseModal = () => setIsUploadModalOpen(false);
     const handleTaskOpenModal = () => setTaskViewModalOpen(true);
     const handleTaskCloseModal = () => setTaskViewModalOpen(false);
+    const handleOpenVoidDocModal = () => setIsVoidDocModalOpen(true);
+    const handleCloseVoidDocModal = () => setIsVoidDocModalOpen(false);
 
     async function fetchDocTypes(){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/types`)
@@ -330,30 +323,59 @@ export default function ClassList(){
             </div>
             <div className="h-full">
                 {
-                    documents.map((doc, idx) => (
-                        <button key={idx} className="h-20 text-left w-full" onDoubleClick={() => (fetchPdf(doc.documentID), setPdfModalOpen(true), setOpenFileName(doc.fileName))}>
-                            <div key={idx} className={"flex w-screen h-full m-auto text-aggie-maroon p-1 text-lg"}>
-                                <div className="ml-4 w-1/3 my-auto">
-                                    {doc.fileName}
-                                </div>
-                                <div className="w-1/5 my-auto">
-                                    {doc.nameUploader}
-                                </div>
-                                <div className="w-1/5 my-auto">
-                                    {moment.utc(doc.timeUploaded).format('MMM Do YYYY, hh:mm A')}
-                                </div>
-                                <div className="w-1/6 my-auto">
-                                    {doc.type}
-                                </div>
-                                <button className="my-auto" onClick={() => (setDetailsFileName(doc.fileName), setDetailsModalOpen(true), fetchDocumentData(doc.documentID))}>
-                                    <IconDotsVertical stroke={3} />
-                                </button>
+                   documents.map((doc, idx) => (
+                    <button
+                        key={idx}
+                        className={`h-20 text-left w-full ${doc.valid ? '' : 'bg-gray-200 text-gray-500'}`}
+                        onDoubleClick={() => {
+                            if (doc.valid) {
+                                fetchPdf(doc.documentID);
+                                setPdfModalOpen(true);
+                                setOpenFileName(doc.fileName);
+                            }
+                        }}
+                    >
+                        <div
+                            key={idx}
+                            className={`flex w-screen h-full m-auto text-aggie-maroon p-1 text-lg ${doc.valid ? '' : 'opacity-50'}`}
+                        >
+                            <div className="ml-4 w-1/3 my-auto">
+                                {doc.fileName}
                             </div>
-                            <div className="w-screen flex mx-auto"> {/* Incase chaning divider width */}
-                                <Divider size={6} style={{width:'100%', height: '100%'}} color={'#500000'}/>
+                            <div className="w-1/5 my-auto">
+                                {doc.nameUploader}
                             </div>
-                        </button>
-                    ))
+                            <div className="w-1/5 my-auto">
+                                {moment.utc(doc.timeUploaded).format('MMM Do YYYY, hh:mm A')}
+                            </div>
+                            <div className="w-1/6 my-auto">
+                                {doc.type}
+                            </div>
+                            <button
+                                className="my-auto"
+                                onClick={() => {
+                                    if (doc.valid) {
+                                        setDetailsFileName(doc.fileName);
+                                        setDetailsModalOpen(true);
+                                        fetchDocumentData(doc.documentID);
+                                    }
+                                }}
+                            >
+                                <IconDotsVertical stroke={3} />
+                            </button>
+                        </div>
+                        <div className="w-screen flex mx-auto">
+                            <Divider
+                                size={6}
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                }}
+                                color={doc.valid ? '#500000' : '#CCCCCC'}
+                            />
+                        </div>
+                    </button>
+                ))
                 }
             </div>
             <div className="h-32 bg-aggie-maroon flex text-white text-2xl font-bold">
@@ -489,6 +511,25 @@ export default function ClassList(){
                                     Add New Remark
                                 </button>
                             </div>
+
+                                <div>
+                                    <button 
+                    className="mt-4 px-4 py-2 bg-aggie-maroon text-white rounded-md border-2 border-aggie-maroon hover:bg-white hover:text-aggie-maroon transition-colors"
+                    type="submit"
+                    onClick={handleOpenVoidDocModal}
+                >
+                    Void
+                </button>
+                                </div>
+                                <Modal 
+                                    opened={isVoidDocModalOpen} 
+                                    onClose={handleCloseVoidDocModal}
+                                    size="lg" 
+                                >
+                                    <VoidDoc docId={documentDetails?.documentId} onClose={handleCloseVoidDocModal}/>
+
+
+                                </Modal>
                         </div>
                     </Modal.Body>
                 </Modal.Content>
