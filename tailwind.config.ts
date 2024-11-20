@@ -16,6 +16,9 @@ const config: Config = {
         'darker-aggie-maroon': '#2b0101',
         'ut-orange': '#bf5700',
       },
+      maxHeight: {
+        '104': '26rem',
+      }
     },
   },
   plugins: [],
