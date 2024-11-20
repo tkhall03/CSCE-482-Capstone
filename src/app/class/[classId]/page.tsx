@@ -545,7 +545,7 @@ export default function ClassList(){
                                     styles={{input: {height: "7rem", borderColor: "#500000", borderWidth: "4px"}}}
                                 />
                                 <div className="w-full flex justify-between px-4">
-                                    <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl">
+                                    <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl" onClick={handleOpenVoidDocModal}>
                                         Void Document
                                     </button>
                                     <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl" onClick={addNewRemark}>
@@ -555,13 +555,6 @@ export default function ClassList(){
                             </div>
 
                                 <div>
-                                    <button 
-                    className="mt-4 px-4 py-2 bg-aggie-maroon text-white rounded-md border-2 border-aggie-maroon hover:bg-white hover:text-aggie-maroon transition-colors"
-                    type="submit"
-                    onClick={handleOpenVoidDocModal}
-                >
-                    Void
-                </button>
                                 </div>
                                 <Modal 
                                     opened={isVoidDocModalOpen} 
