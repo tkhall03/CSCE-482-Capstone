@@ -222,7 +222,6 @@ export default function ClassList(){
             setPageNumber(pageNumber - 1);
         }
     }
-
     async function addNewRemark(){
         if(newRemark.length > 20){
 

@@ -98,7 +98,7 @@ export default function UploadDoc({
                         setValue("files", files);                
                     }}
                     onReject={(files) => console.log('rejected files', files)}
-                    maxSize={5 * 1024 ** 2}
+                    maxSize={5 * (1024 ** 2)}
                     accept={[
                         MIME_TYPES.csv,
                         MIME_TYPES.doc,
