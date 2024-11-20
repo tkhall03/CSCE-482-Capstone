@@ -211,7 +211,7 @@ export default function ClassList(){
     const handlePDFLoadSuccess = ({ numPages }: {numPages: number}) => {
         setNumPages(numPages);
     };
-
+    
     const PdfComponent = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>((props, ref) => (
         <div ref={ref} {...props} className="m-auto w-fit !h-full">
             <Document className="!w-full !h-full" file={`data:application/pdf;base64,${documentBlob}`} onLoadSuccess={handlePDFLoadSuccess}>
@@ -227,6 +227,33 @@ export default function ClassList(){
         }
         else if(!isForward && pageNumber != 1){
             setPageNumber(pageNumber - 1);
+        }
+    }
+
+    async function addNewRemark(){
+        documentDetails
+
+        if(newRemark.length > 20){
+
+            fetch(`https://csce482capstone.csce482capstone.me/api/Documents/addRemark`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                  },
+                body: JSON.stringify({
+                    documentId: documentDetails.documentId,
+                    personId: 2,
+                    remark: newRemark,
+                }),
+            })
+            .then((response) => {
+                if(response.ok){
+                    fetchDocumentData(documentDetails.documentId);
+                }
+            });
+        }
+        else{
+            alert("New Remarks must be more then 20 characters long");
         }
     }
 
@@ -456,24 +483,34 @@ export default function ClassList(){
                                     <></>
                                 }
                                 <div className="text-2xl text-aggie-maroon font-bold ml-4 mb-4">Remarks</div>
-                                <div className="border-4 border-aggie-maroon rounded-xl py-4 overflow-auto mx-4">
+                                <div className="border-4 border-aggie-maroon rounded-xl py-4 overflow-auto mx-4 max-h-104">
                                     {
                                         documentDetails?.remarks.map((remark, idx) => (
-                                            <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col" key={idx}>
-                                                <div className="mx-auto">
-                                                    {remark.remark}
+                                                <div>
+                                                    <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col" key={idx}>
+                                                        <div className="mx-auto">
+                                                            {remark.remark}
+                                                        </div>
+                                                        <div className="flex justify-evenly text-xl">
+                                                            <div>{remark.remarkUser}</div>
+                                                            <div>{moment.utc(remark.remarkDate).format('MMM Do YYYY, hh:mm A')}</div>
+                                                        </div>
+                                                    </div>
+                                                    {
+                                                        idx != documentDetails.remarks.length - 1 ?
+                                                            <div className="w-full flex justify-center my-2">
+                                                                <Divider size={4} style={{width:'90%', height: '100%'}} color={'#500000'}/>
+                                                            </div>
+                                                        :
+                                                            <></>
+                                                    }
                                                 </div>
-                                                <div className="flex justify-evenly text-xl">
-                                                    <div>{remark.remarkUser}</div>
-                                                    <div>{moment.utc(remark.remarkDate).format('MMM Do YYYY, hh:mm A')}</div>
-                                                </div>
-                                            </div>
                                         ))
                                     }
                                 </div>
                             </div>
                             <div className="basis-2/6 flex flex-col w-full">
-                                <div className="px-4 text-2xl font-bold text-aggie-maroon">
+                                <div className="px-4 text-2xl font-bold pt-2 text-aggie-maroon">
                                     New Remark
                                 </div>
                                 <Textarea
@@ -485,9 +522,14 @@ export default function ClassList(){
                                     size="md"
                                     styles={{input: {height: "7rem", borderColor: "#500000", borderWidth: "4px"}}}
                                 />
-                                <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 ml-auto mr-4 rounded-xl">
-                                    Add New Remark
-                                </button>
+                                <div className="w-full flex justify-between px-4">
+                                    <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl">
+                                        Void Document
+                                    </button>
+                                    <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl" onClick={addNewRemark}>
+                                        Add New Remark
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </Modal.Body>
