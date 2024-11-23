@@ -112,12 +112,21 @@ export default function ClassList(){
     const [isTaskViewModalOpen, setTaskViewModalOpen] = useState(false);
     const [isVoidDocModalOpen, setIsVoidDocModalOpen] = useState(false);
 
+    const [isAIModalOpen, setIsAIModalOpen] = useState(false);
+    const [aiModalContent, setAiModalContent] = useState<React.ReactNode>("");
+    const [isMinimized, setIsMinimized] = useState(false); 
+    const [userInput, setUserInput] = useState('');
+
     const handleUploadOpenModal = () => setIsUploadModalOpen(true);
     const handleUploadCloseModal = () => setIsUploadModalOpen(false);
     const handleTaskOpenModal = () => setTaskViewModalOpen(true);
     const handleTaskCloseModal = () => setTaskViewModalOpen(false);
     const handleOpenVoidDocModal = () => setIsVoidDocModalOpen(true);
     const handleCloseVoidDocModal = () => setIsVoidDocModalOpen(false);
+    const handleButtonClick = () => {
+        setIsAIModalOpen(true); 
+        setAiModalContent(""); 
+    };
 
     async function fetchDocTypes(){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/types`)
@@ -184,7 +193,95 @@ export default function ClassList(){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/info/${documentId}`);
         setDocumentDetails(await response.json());
     }
+     // Scrollbox style as an inline style
+     const scrollboxStyle: React.CSSProperties = {
+        maxHeight: '400px',        // Ensure the box has a limited height
+        overflowY: 'auto',         // Enable vertical scrolling if content overflows
+        padding: '10px',           // Optional padding for aesthetics
+        border: '1px solid #ccc',  // Optional border for visibility
+        backgroundColor: '#f9f9f9', // Optional background color for contrast
+        WebkitOverflowScrolling: 'touch', // For smoother scrolling on touch devices (optional)
+    };
+    
+    async function fetchAIResponse(inputData: string) {
+        try {
+            const response = await fetch('http://127.0.0.1:5000/query', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ input: inputData }),
+            });
+    
+            const data = await response.json();
+    
+            if (!response.ok) {
+                // Handle HTTP error response (e.g., 400 or 500)
+                const errorData = data || {};
+                setAiModalContent(
+                    <div style={scrollboxStyle}>
+                        Error: {errorData.message || 'Unknown error'}
+                        <br /> {/* Dummy content to test scrolling */}
+                        <span style={{ display: 'block' }}>More Content</span>
+                        <span style={{ display: 'block' }}>More Content</span>
+                        <span style={{ display: 'block' }}>More Content</span>
+                        <span style={{ display: 'block' }}>More Content</span>
+                        <span style={{ display: 'block' }}>More Content</span>
+                        <span style={{ display: 'block' }}>More Content</span>
+                        <span style={{ display: 'block' }}>More Content</span>
+                        <span style={{ display: 'block' }}>More Content</span>
+                    </div>
+                );
+            } else {
+                const result = data.results;
+                let formattedResults = formatResults(result);
+                setAiModalContent(
+                    <div style={scrollboxStyle} dangerouslySetInnerHTML={{ __html: formattedResults }} />
+                );
+            }
+    
+            setIsAIModalOpen(true); // Ensure modal is open regardless of error
+        } catch (error) {
+            console.error("Error fetching AI response:", error);
+            setAiModalContent(
+                <div style={scrollboxStyle}>
+                    Failed to fetch AI response.
+                    <br /> {/* Dummy content to test scrolling */}
+                    <span style={{ display: 'block' }}>More Content</span>
+                    <span style={{ display: 'block' }}>More Content</span>
+                    <span style={{ display: 'block' }}>More Content</span>
+                    <span style={{ display: 'block' }}>More Content</span>
+                    <span style={{ display: 'block' }}>More Content</span>
+                    <span style={{ display: 'block' }}>More Content</span>
+                    <span style={{ display: 'block' }}>More Content</span>
+                    <span style={{ display: 'block' }}>More Content</span>
+                </div>
+            );
+            setIsAIModalOpen(true); // Ensure modal is open even on failure
+        }
+    }
+    
+    
+   
+    
+    
 
+    function formatResults(results) {
+        if (Array.isArray(results) && results.length > 0) {
+            return results.map(row => {
+                return Object.entries(row)
+                    .map(([key, value]) => `${key}: ${value}`)
+                    .join(', ');
+            }).join('<br />');
+        } else {
+            return "No results found for the query.";
+        }
+    }
+
+    
+    
+    
+    
     useEffect(() => {
         if (params) {
             const classId = Array.isArray(params.classId) ? params.classId[0] : params.classId;
@@ -295,6 +392,45 @@ export default function ClassList(){
                         {documentHeaders(2)}
                     </div>
                 </div>
+                <div className="fixed bottom-4 right-4 z-50">
+                    <button
+                        className="bg-aggie-maroon text-white p-4 rounded-full"
+                        onClick={handleButtonClick} 
+                    >
+                        Chat with AI
+                    </button>
+                </div>
+                {isAIModalOpen && (
+                    <div className={`fixed bottom-4 right-4 z-50 w-80 bg-white border-2 border-aggie-maroon rounded-lg ${isMinimized ? 'h-16' : 'h-96'}`}>
+                        <div className="flex justify-between items-center p-2 bg-aggie-maroon text-white">
+                            <span className="font-bold">AI Chat</span>
+                            <button
+                                className="text-white"
+                                onClick={() => setIsMinimized(!isMinimized)} // Toggle minimize/maximize
+                            >
+                                {isMinimized ? 'Expand' : 'Minimize'}
+                            </button>
+                        </div>
+                        {!isMinimized && (
+                            <div className="p-4">
+                                {/* Input Field for Query */}
+                                <textarea
+                                    value={userInput}
+                                    onChange={(e) => setUserInput(e.target.value)} // Track user input
+                                    placeholder="Type your query here..."
+                                    className="w-full h-32 mb-4"
+                                />
+                                <button 
+                                    onClick={() => fetchAIResponse(userInput)} // Submit query to backend
+                                    className="p-2 bg-aggie-maroon text-white rounded"
+                                >
+                                    Submit Query
+                                </button>
+                                <p>{aiModalContent}</p> {/* Display AI Response or Error */}
+                            </div>
+                        )}
+                    </div>
+                )}
                 <div className="text-3xl mt-4 ml-16">
                     {
                         classes?.deptNo == 1 ?
@@ -321,6 +457,7 @@ export default function ClassList(){
                         <></>
                     }
                 </div>
+                
             </div>
             <div className="w-screen flex mx-auto"> {/* Incase chaning divider width */}
                 <Divider size={6} style={{width:'100%', height: '100%'}} color={'#500000'}/>
@@ -427,6 +564,8 @@ export default function ClassList(){
                     
                     <TasksView tasks={tasks} />
                 </Modal>
+                
+
             </div>
             <Modal.Root opened={pdfModalOpen} onClose={() => (setPdfModalOpen(false), setPageNumber(1))} size="600" centered>
                 <Modal.Overlay />
