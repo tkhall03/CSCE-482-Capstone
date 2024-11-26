@@ -234,7 +234,7 @@ export default function ClassList(){
                 );
             } else {
                 const result = data.results;
-                let formattedResults = formatResults(result);
+                const formattedResults = formatResults(result);
                 setAiModalContent(
                     <div style={scrollboxStyle} dangerouslySetInnerHTML={{ __html: formattedResults }} />
                 );
