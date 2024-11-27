@@ -2,3 +2,4 @@
 /.next/
 .swc/
 .*.env
+/coverage
