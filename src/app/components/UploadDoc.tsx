@@ -3,34 +3,8 @@ import { MultiSelect, TextInput, Select, Card } from '@mantine/core';
 import { IconUpload, IconPhoto, IconX } from '@tabler/icons-react';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 import { Group, Text, rem } from '@mantine/core';
+import { Task, DocType} from "./interfaces"
 
-
-interface Task { 
-    taskId: number,
-    taskCode: string,
-    description: string,
-    nvicCode: string,
-    nvicDescription: string
-}
-
-// interface Nvic { 
-//     nvicId: number,
-//     nvicDescription: string,
-//     nvicCode: string,
-//     tasks: Task[]
-// }
-
-// interface STCW { 
-//     stcwDescription: string
-//     stcwId: number,
-//     stcwCode: string,
-//     nvics: Nvic[]
-// }
-
-interface DocType {
-    docTypeId: number,
-    type: string
-}
 interface UploadDocumentProps{
     classId?: number | null;
     className?: string | null;

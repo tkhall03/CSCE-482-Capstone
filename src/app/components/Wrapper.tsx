@@ -16,5 +16,5 @@ export default function Wrapper({label, disabled, className, children}: WrapperP
           </div>
       </div>
     );
-  }
+}
   

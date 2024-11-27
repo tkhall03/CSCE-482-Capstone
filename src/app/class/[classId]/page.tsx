@@ -3,7 +3,7 @@
 import NavBar from "../../components/NavBar";
 
 import { useState, useEffect, forwardRef } from 'react'
-import { Divider, Modal, HoverCard, TextInput, Textarea } from '@mantine/core';
+import { Divider, Modal, HoverCard, TextInput } from '@mantine/core';
 import { IconAlertTriangleFilled, IconDotsVertical, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useParams } from 'next/navigation'
@@ -14,81 +14,12 @@ import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import UploadDoc from "../../components/UploadDoc";
 import TasksView from "../../components/TasksView";
+import DocumentDetails from "../../components/DocumentDetails";
+
 import moment from 'moment';
-import VoidDoc from "../../components/VoidDoc";
+import {ClassData, DocumentProp, Task, DocType, DocumentInfo, STCW, Nvic} from "../../components/interfaces"
 
-interface ClassData{
-    classId: number,
-    crn: string,
-    sectionNumber: string, 
-    sampleTestDOA: number,
-    syllabus: number,
-    attendance: number,
-    taskRequired: number,
-    taskCompleted: number,
-    documents: DocumentProp[]
-    className: string,
-    deptNo: number,
-}
 
-interface DocumentProp{
-    documentID: number,
-    type: string,
-    nameUploader: string,
-    timeUploaded: string,
-    valid: boolean,
-    fileName: string,
-    tasks: Task[]
-}
-
-interface Task { 
-    taskId: number,
-    taskCode: string,
-    description: string,
-    nvicCode: string,
-    nvicDescription: string
-}
-interface Nvic { 
-    nvicId: number,
-    nvicDescription: string,
-    nvicCode: string,
-    tasks: Task[]
-}
-
-interface STCW { 
-    stcwDescription: string
-    stcwId: number,
-    stcwCode: string,
-    nvics: Nvic[]
-}
-
-interface DocType {
-    docTypeId: number,
-    type: string
-}
-
-interface DocumentInfo{
-    documentId: number,
-    valid: boolean,
-    voidRemarks: string,
-    voidUser: string,
-    voidDateTime: string,
-    uploadUser: string,
-    uploadDateTime: string,
-    remarks: Remark[]
-}
-
-interface Remark{
-    remark: string,
-    remarkUser: string,
-    remarkDate: string
-}
-
-interface Remark{
-    remark: string,
-    remarkUser: string,
-    remarkDate: string
-}
 
 export default function ClassList(){
 
@@ -205,7 +136,7 @@ export default function ClassList(){
     
     async function fetchAIResponse(inputData: string) {
         try {
-            const response = await fetch('http://127.0.0.1:5000/query', {
+            const response = await fetch('https://csce482capstone.csce482capstone.me/chat/query', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -260,11 +191,6 @@ export default function ClassList(){
             setIsAIModalOpen(true); // Ensure modal is open even on failure
         }
     }
-    
-    
-   
-    
-    
 
     function formatResults(results) {
         if (Array.isArray(results) && results.length > 0) {
@@ -277,10 +203,6 @@ export default function ClassList(){
             return "No results found for the query.";
         }
     }
-
-    
-    
-    
     
     useEffect(() => {
         if (params) {
@@ -561,12 +483,10 @@ export default function ClassList(){
                     title="View Tasks"
                     size="lg" 
                 >
-                    
                     <TasksView tasks={tasks} />
                 </Modal>
-                
-
             </div>
+
             <Modal.Root opened={pdfModalOpen} onClose={() => (setPdfModalOpen(false), setPageNumber(1))} size="600" centered>
                 <Modal.Overlay />
                 <Modal.Content>
@@ -603,101 +523,19 @@ export default function ClassList(){
                     </Modal.Body>
                 </Modal.Content>
             </Modal.Root>
-            <Modal.Root opened={detailsModalOpen} onClose={() => (setDetailsModalOpen(false), setNewRemark(""))} size="600" centered>
-                <Modal.Overlay />
-                <Modal.Content className="">
-                    <Modal.Header>
-                        <Modal.Title>
-                            <div className="ml-8 text-2xl text-aggie-maroon font-bold">
-                                {`${detailsFileName} Details`}
-                            </div>
-                        </Modal.Title>
-                        <Modal.CloseButton style={{color: '#500000'}} size="xl"/>
-                    </Modal.Header>
-                    <Modal.Body className="!h-[44rem]">
-                        <div className=" h-full w-full flex flex-col">
-                            <div className="basis-4/6">
-                                
-                                {
-                                    !documentDetails?.valid ?
-                                        <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col">
-                                            <div>Document Voided</div>
-                                            <div className="mx-auto">
-                                                {documentDetails?.voidRemarks}
-                                            </div>
-                                            <div className="flex justify-evenly text-xl">
-                                                <div>{documentDetails?.voidUser}</div>
-                                                <div>{moment.utc(documentDetails?.uploadDateTime).format('MMM Do YYYY, hh:mm A')}</div>
-                                            </div>
-                                        </div>
-                                    :
-                                    <></>
-                                }
-                                <div className="text-2xl text-aggie-maroon font-bold ml-4 mb-4">Remarks</div>
-                                <div className="border-4 border-aggie-maroon rounded-xl py-4 overflow-auto mx-4 max-h-104">
-                                    {
-                                        documentDetails?.remarks.map((remark, idx) => (
-                                                <div key={idx}>
-                                                    <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col" key={idx}>
-                                                        <div className="mx-auto">
-                                                            {remark.remark}
-                                                        </div>
-                                                        <div className="flex justify-evenly text-xl">
-                                                            <div>{remark.remarkUser}</div>
-                                                            <div>{moment.utc(remark.remarkDate).format('MMM Do YYYY, hh:mm A')}</div>
-                                                        </div>
-                                                    </div>
-                                                    {
-                                                        idx != documentDetails.remarks.length - 1 ?
-                                                            <div className="w-full flex justify-center my-2">
-                                                                <Divider size={4} style={{width:'90%', height: '100%'}} color={'#500000'}/>
-                                                            </div>
-                                                        :
-                                                            <></>
-                                                    }
-                                                </div>
-                                        ))
-                                    }
-                                </div>
-                            </div>
-                            <div className="basis-2/6 flex flex-col w-full">
-                                <div className="px-4 text-2xl font-bold pt-2 text-aggie-maroon">
-                                    New Remark
-                                </div>
-                                <Textarea
-                                    value={newRemark}
-                                    onChange={(event) => setNewRemark(event.currentTarget.value)}
-                                    className="!w-full px-4 mx-auto mt-4 !border-aggie-maroon"
-                                    radius="md"
-                                    placeholder="New Remark"
-                                    size="md"
-                                    styles={{input: {height: "7rem", borderColor: "#500000", borderWidth: "4px"}}}
-                                />
-                                <div className="w-full flex justify-between px-4">
-                                    <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl" onClick={handleOpenVoidDocModal}>
-                                        Void Document
-                                    </button>
-                                    <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl" onClick={addNewRemark}>
-                                        Add New Remark
-                                    </button>
-                                </div>
-                            </div>
-
-                                <div>
-                                </div>
-                                <Modal 
-                                    opened={isVoidDocModalOpen} 
-                                    onClose={handleCloseVoidDocModal}
-                                    size="lg" 
-                                >
-                                    <VoidDoc docId={documentDetails?.documentId} onClose={handleCloseVoidDocModal}/>
-
-
-                                </Modal>
-                        </div>
-                    </Modal.Body>
-                </Modal.Content>
-            </Modal.Root>
+            
+            <DocumentDetails 
+                isVoidDocModalOpen={isVoidDocModalOpen}
+                handleOpenVoidDocModal={handleOpenVoidDocModal}
+                handleCloseVoidDocModal={handleCloseVoidDocModal}
+                documentDetails={documentDetails}
+                newRemark={newRemark}
+                setNewRemark={setNewRemark}
+                addNewRemark={addNewRemark}
+                closeDetailsModal={() => {setDetailsModalOpen(false); setNewRemark("")}}
+                detailsModalOpen={detailsModalOpen}
+                detailsFileName={detailsFileName}
+            />
         </div>
     );
 }
