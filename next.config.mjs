@@ -8,10 +8,7 @@ const nextConfig = {
     },
     experimental: {
         optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
-        // webpackBuildWorker: true,
-      },
-    // swcMinify: false,
-
+    },
     output: 'standalone',
 };
 

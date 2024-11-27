@@ -60,6 +60,7 @@ export default function VoidDoc({ docId, onClose }: VoidDocProps) {
                 </label>
                 <textarea
                     id="voidRemark"
+                    data-testid="voidRemark"
                     placeholder="Type remarks here"
                     {...register("voidRemark", {
                         required: "Void remark is required.",

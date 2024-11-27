@@ -1,3 +1,4 @@
+import React from 'react';
 import { Text, Card, Stack } from '@mantine/core';
 
 interface Task { 

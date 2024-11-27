@@ -64,7 +64,7 @@ export default function UploadDoc({
             const formData = new FormData();
             formData.append("file", data.files[0]);
             formData.append("personId", "1");
-            formData.append("classId", (classId?.toString() ?? ""));
+            formData.append("classId", (classId?.toString()));
             formData.append("docType", data.docType);
             formData.append("remark", data.docRemarks);
             if (data.tasks) {
@@ -82,10 +82,10 @@ export default function UploadDoc({
                 console.log("Form submitted successfully");
                 onClose();
             } else {
-                console.error("Error submitting form");
+                alert("error uploading document");
             }
         } catch (e) {
-            console.error("Submission error:", e);
+            alert("error uploading document. " + e);
         }
     };
 
@@ -93,6 +93,7 @@ export default function UploadDoc({
         <div className="bg-white h-screen flex flex-col p-6">
             <form onSubmit={handleSubmit(onSubmit)} className="bg-white flex flex-col space-y-4">
                 <Dropzone
+                    data-testid="dropzone"
                     onDrop={(files) => {
                         console.log('accepted files', files);
                         setValue("files", files);                
@@ -129,6 +130,7 @@ export default function UploadDoc({
 
                 {uploadedFile && uploadedFile[0] && (
                     <Card 
+                        data-testid="uploadedDocCard"
                         shadow="sm" 
                         padding="lg" 
                         withBorder
@@ -156,6 +158,7 @@ export default function UploadDoc({
                 {errors.files && <Text color="red">Files are required.</Text>}
 
                 <Select
+                    data-testid="documentTypeSelection"
                     label="Document Type"
                     placeholder="Pick document type"
                     data={docTypes.map((dt) => ({
@@ -163,10 +166,11 @@ export default function UploadDoc({
                         value: dt.docTypeId.toString()
                     }))}
                     {...register("docType", { required: true })}
-                    onChange={(value) => setValue("docType", value)}
+                    onChange={(value) => {console.log("Selected value:", value); setValue("docType", value)}}
                 />
 
                 <TextInput 
+                    data-testid="documentRemarks"
                     label="Document Remarks" 
                     placeholder="Type remarks here" 
                     {...register("docRemarks", { required: true })}
@@ -175,6 +179,7 @@ export default function UploadDoc({
                 
                 {currentDocType == 1 && (
                     <MultiSelect
+                        data-testid="tasksSelection"
                         label={`Tasks for ${className}`}
                         placeholder="Pick tasks this document supports"
                         data={uniqueTasks.map((task) => ({
@@ -187,6 +192,7 @@ export default function UploadDoc({
                 )}
 
                 <button 
+                    data-testid="upload"
                     className="mt-4 px-4 py-2 bg-aggie-maroon text-white rounded-md border-2 border-aggie-maroon hover:bg-white hover:text-aggie-maroon transition-colors"
                     type="submit"
                 >

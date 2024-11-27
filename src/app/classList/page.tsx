@@ -1,5 +1,5 @@
 'use client'
-
+import React from 'react';
 import NavBar from "../components/NavBar";
 import Wrapper from "../components/Wrapper";
 
@@ -86,22 +86,24 @@ export default function ClassList(){
 
     return (
         <div className="bg-white w-full">
-      	    <NavBar/>
+      	    <NavBar />
 
             <div className="flex-col h-screen">
                 {
                     classes.map((term, index) => (
                         <div key={index} className="w-full ">
-                            <Divider size={8} label={term.termCode}  styles={{ label: { color: `${!term.status? '#50000066' : '#500000'}`,  fontSize: '30px', fontWeight: 'bold'} }} labelPosition="center" color={`${!term.status? '#50000066' : '#500000'}`}/>
+                            <Divider data-testid="Divider" size={8} label={term.termCode}  styles={{ label: { color: `${!term.status? '#50000066' : '#500000'}`,  fontSize: '30px', fontWeight: 'bold'} }} labelPosition="center" color={`${!term.status? '#50000066' : '#500000'}`}/>
                                 {
                                     term.catalogs.map((termClass, idx) => (
                                         <div key={idx}>
-                                            <Wrapper label={termClass.catalogName} className="m-2 bg-inherit " disabled={!term.status}>
+                                            <Wrapper data-testid="Wrapper" label={termClass.catalogName} className="m-2 bg-inherit " disabled={!term.status}>
                                                 {
                                                     termClass.classes.map((classSection, i) => (
                                                             <button key={i} className={`z-10 mx-10 font-bold border-4 rounded-xl ${term.status ? "border-aggie-maroon text-aggie-maroon" : "border-fadded-aggie-maroon text-fadded-aggie-maroon" }`} 
-                                                                onClick={() => router.push(`/class/${classSection.classId}`)}
-                                                                            >
+                                                                onClick={() => {
+                                                                        console.log('Button clicked, navigating to:', `/class/${classSection.classId}`);
+                                                                        router.push(`/class/${classSection.classId}`)
+                                                                    }}>
                                                                 <div className="flex flex-col p-2">
                                                                     <div>Section: {classSection.sectionNumber}</div>
                                                                     {getStatusTasks(classSection, termClass.designation, classSection.taskRequired, term.status)}
