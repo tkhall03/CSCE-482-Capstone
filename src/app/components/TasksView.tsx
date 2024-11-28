@@ -15,7 +15,7 @@ interface TasksViewProps {
 
 export default function TasksView({ tasks }: TasksViewProps) {
     return (
-        <div className="h-screen w-full flex justify-start">
+        <div className="h-screen w-full flex justify-start" data-testid="tasksView">
             <Stack gap="md">
                 {tasks.map((task: Task) => (
                     <Card key={task.taskCode} shadow="sm" padding="lg" radius="md" withBorder

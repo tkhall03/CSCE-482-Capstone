@@ -1,27 +1,25 @@
 'use client'
-
-import NavBar from "../../components/NavBar";
-
-import { useState, useEffect, forwardRef } from 'react'
-import { Divider, Modal, HoverCard, TextInput } from '@mantine/core';
-import { IconAlertTriangleFilled, IconDotsVertical, IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
-import { Document, Page, pdfjs } from 'react-pdf';
+import { useState, useEffect } from 'react'
+import { Divider, Modal } from '@mantine/core';
+import { IconAlertTriangleFilled, IconDotsVertical } from '@tabler/icons-react';
+import { pdfjs } from 'react-pdf';
 import { useParams } from 'next/navigation'
-
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+import moment from 'moment';
 
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
+
+import NavBar from "../../components/NavBar";
 import UploadDoc from "../../components/UploadDoc";
 import TasksView from "../../components/TasksView";
 import DocumentDetails from "../../components/DocumentDetails";
-
-import moment from 'moment';
+import PdfModal from "../../components/PdfModal"
+import AIModal from "../../components/AIModal";
 import {ClassData, DocumentProp, Task, DocType, DocumentInfo, STCW, Nvic} from "../../components/interfaces"
 
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-
-export default function ClassList(){
+export default function Class(){
 
     const params = useParams();
     
@@ -44,9 +42,6 @@ export default function ClassList(){
     const [isVoidDocModalOpen, setIsVoidDocModalOpen] = useState(false);
 
     const [isAIModalOpen, setIsAIModalOpen] = useState(false);
-    const [aiModalContent, setAiModalContent] = useState<React.ReactNode>("");
-    const [isMinimized, setIsMinimized] = useState(false); 
-    const [userInput, setUserInput] = useState('');
 
     const handleUploadOpenModal = () => setIsUploadModalOpen(true);
     const handleUploadCloseModal = () => setIsUploadModalOpen(false);
@@ -54,10 +49,6 @@ export default function ClassList(){
     const handleTaskCloseModal = () => setTaskViewModalOpen(false);
     const handleOpenVoidDocModal = () => setIsVoidDocModalOpen(true);
     const handleCloseVoidDocModal = () => setIsVoidDocModalOpen(false);
-    const handleButtonClick = () => {
-        setIsAIModalOpen(true); 
-        setAiModalContent(""); 
-    };
 
     async function fetchDocTypes(){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/types`)
@@ -68,7 +59,6 @@ export default function ClassList(){
         });
         console.log(fetchedDocTypes);
         setdocTypes(fetchedDocTypes);
-
     }
 
     
@@ -92,8 +82,6 @@ export default function ClassList(){
         setTasks(fetchedTasks);
     }
 
-
-
     async function fetchClassData(classId: number){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/classes/${classId}`)
         const data = await response.json()
@@ -110,98 +98,18 @@ export default function ClassList(){
         let base64String;
         reader.onloadend = () => {
             base64String = reader.result;
-            if (base64String) {
-                setDocumentBlob((base64String as string)?.substr((base64String as string).indexOf(',') + 1) ?? '');
+            if(base64String) {
+                setDocumentBlob((base64String as string)?.substr((base64String as string).indexOf(',') + 1));
 
             } else {
                 setDocumentBlob(''); 
             }
-            
         };
     }
 
     async function fetchDocumentData(documentId: number){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/info/${documentId}`);
         setDocumentDetails(await response.json());
-    }
-     // Scrollbox style as an inline style
-     const scrollboxStyle: React.CSSProperties = {
-        maxHeight: '400px',        // Ensure the box has a limited height
-        overflowY: 'auto',         // Enable vertical scrolling if content overflows
-        padding: '10px',           // Optional padding for aesthetics
-        border: '1px solid #ccc',  // Optional border for visibility
-        backgroundColor: '#f9f9f9', // Optional background color for contrast
-        WebkitOverflowScrolling: 'touch', // For smoother scrolling on touch devices (optional)
-    };
-    
-    async function fetchAIResponse(inputData: string) {
-        try {
-            const response = await fetch('https://csce482capstone.csce482capstone.me/chat/query', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ input: inputData }),
-            });
-    
-            const data = await response.json();
-    
-            if (!response.ok) {
-                // Handle HTTP error response (e.g., 400 or 500)
-                const errorData = data || {};
-                setAiModalContent(
-                    <div style={scrollboxStyle}>
-                        Error: {errorData.message || 'Unknown error'}
-                        <br /> {/* Dummy content to test scrolling */}
-                        <span style={{ display: 'block' }}>More Content</span>
-                        <span style={{ display: 'block' }}>More Content</span>
-                        <span style={{ display: 'block' }}>More Content</span>
-                        <span style={{ display: 'block' }}>More Content</span>
-                        <span style={{ display: 'block' }}>More Content</span>
-                        <span style={{ display: 'block' }}>More Content</span>
-                        <span style={{ display: 'block' }}>More Content</span>
-                        <span style={{ display: 'block' }}>More Content</span>
-                    </div>
-                );
-            } else {
-                const result = data.results;
-                const formattedResults = formatResults(result);
-                setAiModalContent(
-                    <div style={scrollboxStyle} dangerouslySetInnerHTML={{ __html: formattedResults }} />
-                );
-            }
-    
-            setIsAIModalOpen(true); // Ensure modal is open regardless of error
-        } catch (error) {
-            console.error("Error fetching AI response:", error);
-            setAiModalContent(
-                <div style={scrollboxStyle}>
-                    Failed to fetch AI response.
-                    <br /> {/* Dummy content to test scrolling */}
-                    <span style={{ display: 'block' }}>More Content</span>
-                    <span style={{ display: 'block' }}>More Content</span>
-                    <span style={{ display: 'block' }}>More Content</span>
-                    <span style={{ display: 'block' }}>More Content</span>
-                    <span style={{ display: 'block' }}>More Content</span>
-                    <span style={{ display: 'block' }}>More Content</span>
-                    <span style={{ display: 'block' }}>More Content</span>
-                    <span style={{ display: 'block' }}>More Content</span>
-                </div>
-            );
-            setIsAIModalOpen(true); // Ensure modal is open even on failure
-        }
-    }
-
-    function formatResults(results) {
-        if (Array.isArray(results) && results.length > 0) {
-            return results.map(row => {
-                return Object.entries(row)
-                    .map(([key, value]) => `${key}: ${value}`)
-                    .join(', ');
-            }).join('<br />');
-        } else {
-            return "No results found for the query.";
-        }
     }
     
     useEffect(() => {
@@ -218,53 +126,6 @@ export default function ClassList(){
         }
         fetchDocTypes();
     }, [params]);
-
-    // when document loaded sets total number of pages of the document
-    const handlePDFLoadSuccess = ({ numPages }: {numPages: number}) => {
-        setNumPages(numPages);
-    };
-    
-    const PdfComponent = forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<'div'>>((props, ref) => (
-        <div ref={ref} {...props} className="m-auto w-fit !h-full">
-            <Document className="!w-full !h-full" file={`data:application/pdf;base64,${documentBlob}`} onLoadSuccess={handlePDFLoadSuccess}>
-                <Page className="!w-full" height={screen.height * .6} pageNumber={pageNumber} />
-            </Document>
-        </div>
-    ));
-    PdfComponent.displayName = "PdfComponent";
-
-    function handleButtonForward(isForward: boolean){
-        if(isForward && pageNumber != numPages){
-            setPageNumber(pageNumber + 1);
-        }
-        else if(!isForward && pageNumber != 1){
-            setPageNumber(pageNumber - 1);
-        }
-    }
-    async function addNewRemark(){
-        if(newRemark.length > 20){
-
-            fetch(`https://csce482capstone.csce482capstone.me/api/Documents/addRemark`, {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                  },
-                body: JSON.stringify({
-                    documentId: documentDetails.documentId,
-                    personId: 2,
-                    remark: newRemark,
-                }),
-            })
-            .then((response) => {
-                if(response.ok){
-                    fetchDocumentData(documentDetails.documentId);
-                }
-            });
-        }
-        else{
-            alert("New Remarks must be more then 20 characters long");
-        }
-    }
 
     function documentHeaders(feild: number){
         const feilds = ["Syllabus", "Attendance", "Sample Test"]
@@ -313,46 +174,7 @@ export default function ClassList(){
                         {documentHeaders(1)}
                         {documentHeaders(2)}
                     </div>
-                </div>
-                <div className="fixed bottom-4 right-4 z-50">
-                    <button
-                        className="bg-aggie-maroon text-white p-4 rounded-full"
-                        onClick={handleButtonClick} 
-                    >
-                        Chat with AI
-                    </button>
-                </div>
-                {isAIModalOpen && (
-                    <div className={`fixed bottom-4 right-4 z-50 w-80 bg-white border-2 border-aggie-maroon rounded-lg ${isMinimized ? 'h-16' : 'h-96'}`}>
-                        <div className="flex justify-between items-center p-2 bg-aggie-maroon text-white">
-                            <span className="font-bold">AI Chat</span>
-                            <button
-                                className="text-white"
-                                onClick={() => setIsMinimized(!isMinimized)} // Toggle minimize/maximize
-                            >
-                                {isMinimized ? 'Expand' : 'Minimize'}
-                            </button>
-                        </div>
-                        {!isMinimized && (
-                            <div className="p-4">
-                                {/* Input Field for Query */}
-                                <textarea
-                                    value={userInput}
-                                    onChange={(e) => setUserInput(e.target.value)} // Track user input
-                                    placeholder="Type your query here..."
-                                    className="w-full h-32 mb-4"
-                                />
-                                <button 
-                                    onClick={() => fetchAIResponse(userInput)} // Submit query to backend
-                                    className="p-2 bg-aggie-maroon text-white rounded"
-                                >
-                                    Submit Query
-                                </button>
-                                <p>{aiModalContent}</p> {/* Display AI Response or Error */}
-                            </div>
-                        )}
-                    </div>
-                )}
+                </div>  
                 <div className="text-3xl mt-4 ml-16">
                     {
                         classes?.deptNo == 1 ?
@@ -362,7 +184,7 @@ export default function ClassList(){
                                 </div>
                                 <div className={`ml-12 flex w-full text-2xl ${classes?.taskCompleted == classes?.taskRequired ? "text-aggie-maroon" : "text-ut-orange"}`}>
                                     {classes?.taskCompleted} / {classes?.taskRequired}
-                                    {classes?.taskCompleted != classes?.taskRequired ? <IconAlertTriangleFilled className="ml-1 m-auto fill-ut-orange" stroke={3}/> : <></>}
+                                    {classes?.taskCompleted != classes?.taskRequired ? <IconAlertTriangleFilled className="ml-1 m-auto fill-ut-orange" stroke={3} data-testid="errorTriangle"/> : <></>}
                                 </div>
                             </div>
                         :
@@ -372,7 +194,7 @@ export default function ClassList(){
                 <div className="text-3xl ml-16 h-full flex">
                     {
                         classes?.deptNo == 1 ?
-                            <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4" onClick={handleTaskOpenModal}>
+                            <button className="my-auto border-4 border-aggie-maroon rounded-xl w-full px-4" onClick={handleTaskOpenModal} data-testid="viewTasksButton">
                                 View Tasks
                             </button>
                         :
@@ -407,11 +229,11 @@ export default function ClassList(){
             <div className="h-full">
                 {
                    documents.map((doc, idx) => (
-                    <button
+                    <div
                         key={idx}
                         className={`h-20 text-left w-full p-0 m-0 flex flex-col ${doc.valid ? '' : 'bg-gray-200 text-gray-500'}`}
                         onDoubleClick={() => {
-                            if (doc.valid) {
+                            if (doc.valid) { 
                                 fetchPdf(doc.documentID);
                                 setPdfModalOpen(true);
                                 setOpenFileName(doc.fileName);
@@ -437,92 +259,81 @@ export default function ClassList(){
                             <button
                                 className="my-auto"
                                 onClick={() => {
-                                    if (doc.valid) {
-                                        setDetailsFileName(doc.fileName);
-                                        setDetailsModalOpen(true);
-                                        fetchDocumentData(doc.documentID);
-                                    }
+                                    setDetailsFileName(doc.fileName);
+                                    setDetailsModalOpen(true);
+                                    fetchDocumentData(doc.documentID);
                                 }}
+                                data-testid="details"
                             >
                                 <IconDotsVertical stroke={3} />
                             </button>
                         </div>
-                        <div className="w-screen h-1.5 m-0 p-0 bg-aggie-maroon">
-                            
-                        </div>
-                    </button>
+                        <div className="w-screen h-1.5 m-0 p-0 bg-aggie-maroon"/>
+                    </div>
                 ))
                 }
             </div>
-            <div className="h-32 bg-aggie-maroon flex text-white text-2xl font-bold">
+            <div className="h-32 bg-aggie-maroon flex justify-between text-white text-2xl font-bold">
                 <button 
                     className="ml-8 my-auto border-4 rounded-xl h-3/5 w-64"
                     onClick={handleUploadOpenModal}
+                    data-testid="uploadDocumentButton"
                 >
                     Upload Document
                 </button>
-
-                <Modal 
-                    opened={isUploadModalOpen} 
-                    onClose={handleUploadCloseModal} 
-                    title="Upload Document"
-                    size="lg" 
+                <button 
+                    className="mr-8 my-auto border-4 rounded-xl h-3/5 w-64"
+                    onClick={() => {setIsAIModalOpen(true)}}
+                    data-testid="chatButton"
                 >
-                    
-                    <UploadDoc 
-                        classId={classes?.classId} 
-                        className={classes?.className}
-                        docTypes={docTypes}
-                        tasks={tasks}
-                        onClose={handleUploadCloseModal}
-                    />
-                </Modal>
-                <Modal 
-                    opened={isTaskViewModalOpen} 
-                    onClose={handleTaskCloseModal} 
-                    title="View Tasks"
-                    size="lg" 
-                >
-                    <TasksView tasks={tasks} />
-                </Modal>
+                    Chat with AI
+                </button>
             </div>
 
-            <Modal.Root opened={pdfModalOpen} onClose={() => (setPdfModalOpen(false), setPageNumber(1))} size="600" centered>
+            {isAIModalOpen && (<AIModal setIsAIModalOpen={setIsAIModalOpen}/>)} 
+
+            <Modal.Root opened={isUploadModalOpen} onClose={handleUploadCloseModal} size="lg">
                 <Modal.Overlay />
-                <Modal.Content>
+                <Modal.Content data-testid="uploadDocumentContent">
                     <Modal.Header>
-                        <Modal.Title>
-                            <div className="ml-8 text-2xl text-aggie-maroon font-bold">
-                                {openFileName}
-                            </div>
-                        </Modal.Title>
-                        <Modal.CloseButton style={{color: '#500000'}} size="xl"/>
+                        <Modal.Title>Upload Document</Modal.Title>
+                        <Modal.CloseButton data-testid="closeButton" />
                     </Modal.Header>
-                    <Modal.Body className="!h-[44rem]">
-                        <HoverCard shadow="md" offset={-screen.height * .1}>
-                            <HoverCard.Target>
-                                <PdfComponent/>
-                            </HoverCard.Target>
-                            <HoverCard.Dropdown className='flex place-items-center !py-2 !px-0'>
-                                    <button className="px-2" onClick={() => handleButtonForward(false)}>
-                                        <IconArrowLeft stroke={2} size='1rem' />
-                                    </button>
-                                    <TextInput
-                                        value={pageNumber}
-                                        onChange={(event) => setPageNumber(Number(event.currentTarget.value))}
-                                        inputSize="3"
-                                        size="xs"
-                                        styles={{input: {textAlign: "center", padding: 0}}}
-                                    />
-                                    <div className="pl-2 text-xs">{`of ${numPages}`}</div>
-                                    <button className="px-2" onClick={() => handleButtonForward(true)}>
-                                        <IconArrowRight stroke={2} size='1rem' />
-                                    </button>
-                            </HoverCard.Dropdown>
-                        </HoverCard>
+                    <Modal.Body>
+                        <UploadDoc 
+                            classId={classes?.classId} 
+                            className={classes?.className}
+                            docTypes={docTypes}
+                            tasks={tasks}
+                            onClose={handleUploadCloseModal}
+                        />
                     </Modal.Body>
                 </Modal.Content>
             </Modal.Root>
+
+            <Modal.Root opened={isTaskViewModalOpen} onClose={handleTaskCloseModal} size="lg">
+                <Modal.Overlay />
+                <Modal.Content data-testid="viewTasksContent">
+                    <Modal.Header>
+                        <Modal.Title>View Tasks</Modal.Title>
+                        <Modal.CloseButton data-testid="closeButton" />
+                    </Modal.Header>
+                    <Modal.Body>
+                        <TasksView tasks={tasks} />
+                    </Modal.Body>
+                </Modal.Content>
+            </Modal.Root>
+
+            <PdfModal
+                pdfModalOpen={pdfModalOpen}
+                pdfModalClose={() => {setPdfModalOpen(false); setPageNumber(1)}}
+                openFileName={openFileName}
+                setNumPages={setNumPages}
+                documentBlob={documentBlob}
+                pageNumber={pageNumber}
+                setPageNumber={setPageNumber}
+                numPages={numPages}
+            />
             
             <DocumentDetails 
                 isVoidDocModalOpen={isVoidDocModalOpen}
@@ -531,7 +342,7 @@ export default function ClassList(){
                 documentDetails={documentDetails}
                 newRemark={newRemark}
                 setNewRemark={setNewRemark}
-                addNewRemark={addNewRemark}
+                fetchDocumentData={fetchDocumentData}
                 closeDetailsModal={() => {setDetailsModalOpen(false); setNewRemark("")}}
                 detailsModalOpen={detailsModalOpen}
                 detailsFileName={detailsFileName}

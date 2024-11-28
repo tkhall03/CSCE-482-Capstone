@@ -11,6 +11,9 @@ module.exports = createJestConfig({
 	transform: {
     	'^.+\\.(ts|tsx)$': ['babel-jest', { presets: ['next/babel'] }],
   	},
+	transformIgnorePatterns: [
+		'node_modules/(?!(pdfjs-dist)/)',
+  	],
 	moduleFileExtensions: ['js', 'jsx', 'ts', 'tsx'],
 	collectCoverage: true,
 	collectCoverageFrom: [

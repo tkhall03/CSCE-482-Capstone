@@ -10,7 +10,7 @@ interface DocumentDetailsProps {
     documentDetails: DocumentInfo,
     newRemark: string,
     setNewRemark: (arg0: string) => void,
-    addNewRemark: () => void,
+    fetchDocumentData: (arg0: number) => void,
     closeDetailsModal: () => void,
     detailsModalOpen: boolean,
     detailsFileName: string
@@ -24,23 +24,47 @@ export default function DocumentDetails(
         documentDetails, 
         newRemark, 
         setNewRemark, 
-        addNewRemark,
+        fetchDocumentData,
         closeDetailsModal, 
         detailsModalOpen, 
         detailsFileName
     }: DocumentDetailsProps){
     
+    async function addNewRemark(){
+        if(newRemark.length > 20){
+            fetch(`https://csce482capstone.csce482capstone.me/api/Documents/addRemark`, {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                    },
+                body: JSON.stringify({
+                    documentId: documentDetails.documentId,
+                    personId: 2,
+                    remark: newRemark,
+                }),
+            })
+            .then((response) => {
+                if(response.ok){
+                    fetchDocumentData(documentDetails.documentId);
+                }
+            });
+        }
+        else{
+            alert("New Remarks must be more then 20 characters long");
+        }
+    }
+
     return(
-        <Modal.Root opened={detailsModalOpen} onClose={closeDetailsModal} size="600" centered>
+        <Modal.Root opened={detailsModalOpen} onClose={closeDetailsModal} size="600" centered data-testid="documentDetails"> 
             <Modal.Overlay />
-            <Modal.Content className="">
+            <Modal.Content className="" data-testid="documentDetailsContent">
                 <Modal.Header>
                     <Modal.Title>
                         <div className="ml-8 text-2xl text-aggie-maroon font-bold">
                             {`${detailsFileName} Details`}
                         </div>
                     </Modal.Title>
-                    <Modal.CloseButton style={{color: '#500000'}} size="xl"/>
+                    <Modal.CloseButton style={{color: '#500000'}} size="xl" data-testid="closeButton"/>
                 </Modal.Header>
                 <Modal.Body className="!h-[44rem]">
                     <div className=" h-full w-full flex flex-col">
@@ -48,15 +72,17 @@ export default function DocumentDetails(
                             
                             {
                                 !documentDetails?.valid ?
-                                    <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col">
-                                        <div>Document Voided</div>
-                                        <div className="mx-auto">
-                                            {documentDetails?.voidRemarks}
-                                        </div>
-                                        <div className="flex justify-evenly text-xl">
-                                            <div>{documentDetails?.voidUser}</div>
-                                            <div>{moment.utc(documentDetails?.uploadDateTime).format('MMM Do YYYY, hh:mm A')}</div>
-                                        </div>
+                                    <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col mb-2" data-testid="voidDiv">
+                                        <div className='mb-2'>Document Voided</div>
+                                        <div className=" p-4 text-2xl text-aggie-maroon font-bold flex flex-col border-aggie-maroon border-4 rounded-xl">
+                                                <div className="mx-auto text-center">
+                                                    {documentDetails?.voidRemarks}
+                                                </div>
+                                                <div className="flex justify-evenly text-xl">
+                                                    <div>{documentDetails?.voidUser}</div>
+                                                    <div>{moment.utc(documentDetails?.voidDateTime).format('MMM Do YYYY, hh:mm A')}</div>
+                                                </div>
+                                            </div>
                                     </div>
                                 :
                                 <></>
@@ -67,7 +93,7 @@ export default function DocumentDetails(
                                     documentDetails?.remarks.map((remark, idx) => (
                                         <div key={idx}>
                                             <div className="text-2xl text-aggie-maroon font-bold ml-4 flex flex-col" key={idx}>
-                                                <div className="mx-auto">
+                                                <div className="mx-auto text-center">
                                                     {remark.remark}
                                                 </div>
                                                 <div className="flex justify-evenly text-xl">
@@ -100,9 +126,10 @@ export default function DocumentDetails(
                                 placeholder="New Remark"
                                 size="md"
                                 styles={{input: {height: "7rem", borderColor: "#500000", borderWidth: "4px"}}}
+                                data-testid="textArea"
                             />
                             <div className="w-full flex justify-between px-4">
-                                <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl" onClick={handleOpenVoidDocModal}>
+                                <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl" onClick={handleOpenVoidDocModal} data-testid="voidDocumentButton">
                                     Void Document
                                 </button>
                                 <button className="text-2xl text-aggie-maroon font-bold border-4 border-aggie-maroon w-fit px-4 mt-4 rounded-xl" onClick={addNewRemark}>
@@ -113,13 +140,18 @@ export default function DocumentDetails(
 
                             <div>
                             </div>
-                            <Modal 
-                                opened={isVoidDocModalOpen} 
-                                onClose={handleCloseVoidDocModal}
-                                size="lg" 
-                            >
-                                <VoidDoc docId={documentDetails?.documentId} onClose={handleCloseVoidDocModal}/>
-                            </Modal>
+                            <Modal.Root opened={isVoidDocModalOpen} onClose={handleCloseVoidDocModal} size="lg">
+                                <Modal.Overlay />
+                                <Modal.Content data-testid="voidDocumentContent">
+                                    <Modal.Header>
+                                        <Modal.Title>View Tasks</Modal.Title>
+                                        <Modal.CloseButton data-testid="voidCloseButton" />
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        <VoidDoc docId={documentDetails?.documentId} onClose={handleCloseVoidDocModal}/>
+                                    </Modal.Body>
+                                </Modal.Content>
+                            </Modal.Root>
                     </div>
                 </Modal.Body>
             </Modal.Content>
