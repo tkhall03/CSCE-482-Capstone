@@ -27,7 +27,6 @@ export default function Class(){
     const [docTypes, setdocTypes] = useState<DocType[]>([]);
     const [documents, setDocuments] = useState<DocumentProp[]>([]);
     const [classes, setClasses] = useState<ClassData>();
-    const [reloadTrigger, setReloadTrigger] = useState<boolean>(false);
     const [documentBlob, setDocumentBlob] = useState<string>('');
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pdfModalOpen, setPdfModalOpen] = useState<boolean>(false);
@@ -101,10 +100,6 @@ export default function Class(){
         setDocuments(sortedDocuments)
     }
 
-    const onDocumentVoided = () => {
-        setReloadTrigger((prev) => !prev); // Trigger reload only when voiding happens
-    };
-
     async function fetchPdf(documentNum: number){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
         const file = await response.blob();
@@ -132,36 +127,31 @@ export default function Class(){
 
             console.log('Response Headers:', Array.from(response.headers.entries()));
 
+            let fileName = `document_${documentNum}`;
+            
             const contentDisposition = response.headers.get('Content-Disposition');
-            let fileName = `document_${documentNum}`; // Default filename
-            if (contentDisposition && contentDisposition.includes('filename=')) {
+            if(contentDisposition && contentDisposition.includes('filename=')){
                 const fileNameMatch = contentDisposition.match(/filename=(["']?)([^;]*)\1/i);
-                if (fileNameMatch?.[2]) {
+                if(fileNameMatch?.[2]){
                     fileName = fileNameMatch[2].replace(/["']/g, '');
                 }
             }
 
-            console.log('Extracted Filename:', fileName);
-
-            // Convert response to Blob
             const blob = await response.blob();
-
-            // Log blob type and size
-            console.log('Blob Type:', blob.type);
-            console.log('Blob Size:', blob.size);
-
-            // Create a temporary link element
             const link = document.createElement('a');
-            link.href = window.URL.createObjectURL(blob);
-            link.download = fileName;
+            const objectUrl = window.URL.createObjectURL(blob);
+
+            link.setAttribute('download', fileName);
+            link.setAttribute('href', objectUrl);
+            link.setAttribute('target', '_blank');
             link.style.display = 'none';
 
-            // Append link to the document, trigger click, and clean up
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-
-        } catch (error) {
+            window.URL.revokeObjectURL(objectUrl);
+        }
+        catch (error){
             console.error('Error downloading document:', error.message);
         }
     }
@@ -185,7 +175,7 @@ export default function Class(){
             }
         }
         fetchDocTypes();
-    }, [params, reloadTrigger]);
+    }, [params]);
 
     function documentHeaders(feild: number){
         const feilds = ["Syllabus", "Attendance", "Sample Test"]
@@ -419,7 +409,6 @@ export default function Class(){
                 closeDetailsModal={() => {setDetailsModalOpen(false); setNewRemark("")}}
                 detailsModalOpen={detailsModalOpen}
                 detailsFileName={detailsFileName}
-                onDocumentVoided={() => (fetchClassData(classId))}
             />
         </div>
     );
