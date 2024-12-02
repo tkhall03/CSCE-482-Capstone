@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Divider, Modal } from '@mantine/core';
-import { IconAlertTriangleFilled, IconDotsVertical } from '@tabler/icons-react';
+import { IconAlertTriangleFilled, IconDotsVertical, IconDownload } from '@tabler/icons-react';
 import { pdfjs } from 'react-pdf';
 import { useParams } from 'next/navigation'
 import moment from 'moment';
@@ -37,6 +37,7 @@ export default function Class(){
     const [detailsModalOpen, setDetailsModalOpen] = useState<boolean>(false);
     const [newRemark, setNewRemark] = useState<string>("");
     const [documentDetails, setDocumentDetails] = useState<DocumentInfo>();
+    const [classId, setClassId] = useState<number>();
 
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
     const [isTaskViewModalOpen, setTaskViewModalOpen] = useState(false);
@@ -121,6 +122,50 @@ export default function Class(){
         };
     }
 
+    async function downloadDocument(documentNum: number){
+        try{
+            const response = await fetch(`https://csce482capstone.csce482capstone.me/api/documents/download/${documentNum}`, { method: 'GET' });
+
+            if(!response.ok){
+                throw new Error(`Failed to download document. Status: ${response.status}`);
+            }
+
+            console.log('Response Headers:', Array.from(response.headers.entries()));
+
+            const contentDisposition = response.headers.get('Content-Disposition');
+            let fileName = `document_${documentNum}`; // Default filename
+            if (contentDisposition && contentDisposition.includes('filename=')) {
+                const fileNameMatch = contentDisposition.match(/filename=(["']?)([^;]*)\1/i);
+                if (fileNameMatch?.[2]) {
+                    fileName = fileNameMatch[2].replace(/["']/g, '');
+                }
+            }
+
+            console.log('Extracted Filename:', fileName);
+
+            // Convert response to Blob
+            const blob = await response.blob();
+
+            // Log blob type and size
+            console.log('Blob Type:', blob.type);
+            console.log('Blob Size:', blob.size);
+
+            // Create a temporary link element
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.download = fileName;
+            link.style.display = 'none';
+
+            // Append link to the document, trigger click, and clean up
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+        } catch (error) {
+            console.error('Error downloading document:', error.message);
+        }
+    }
+
     async function fetchDocumentData(documentId: number){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/info/${documentId}`);
         setDocumentDetails(await response.json());
@@ -133,6 +178,7 @@ export default function Class(){
     
             if (!isNaN(parsedClassId)) {
                 fetchClassData(parsedClassId);
+                setClassId(parsedClassId);
                 fetchTaskData(parsedClassId);
             } else {
                 console.error("classId is not a valid number");
@@ -221,10 +267,10 @@ export default function Class(){
                 <Divider size={6} style={{width:'100%', height: '100%'}} color={'#500000'}/>
             </div>
             <div className="flex w-screen text-xl font-bold my-2 text-aggie-maroon">
-                <div className="ml-4 w-1/3">
+                <div className="ml-4 w-1/4">
                     Document Name
                 </div>
-                <div className="w-1/5">
+                <div className="w-1/6">
                     Uploaded By
                 </div>
                 <div className="w-1/5">
@@ -233,8 +279,11 @@ export default function Class(){
                 <div className="w-1/6">
                     Type
                 </div>
-                <div className="">
+                <div className=" mx-auto">
                     Details
+                </div>
+                <div className=" mx-auto">
+                    Download
                 </div>
             </div>
             <div className="w-screen flex mx-auto"> {/* Incase chaning divider width */}
@@ -258,10 +307,10 @@ export default function Class(){
                             key={idx}
                             className={`flex w-screen h-max my-0 py-0 px-1 text-aggie-maroon text-lg grow ${doc.valid ? '' : 'opacity-50'}`}
                         >
-                            <div className="ml-4 w-1/3 my-auto">
+                            <div className="ml-4 w-1/4 my-auto">
                                 {doc.fileName}
                             </div>
-                            <div className="w-1/5 my-auto">
+                            <div className="w-1/6 my-auto">
                                 {doc.nameUploader}
                             </div>
                             <div className="w-1/5 my-auto">
@@ -271,7 +320,7 @@ export default function Class(){
                                 {doc.type}
                             </div>
                             <button
-                                className="my-auto"
+                                className="my-auto mx-auto"
                                 onClick={() => {
                                     setDetailsFileName(doc.fileName);
                                     setDetailsModalOpen(true);
@@ -280,6 +329,15 @@ export default function Class(){
                                 data-testid="details"
                             >
                                 <IconDotsVertical stroke={3} />
+                            </button>
+                            <button
+                                className="my-auto  mx-auto"
+                                onClick={() => {
+                                    downloadDocument(doc.documentID);
+                                }}
+                                data-testid="details"
+                            >
+                                <IconDownload stroke={3} />
                             </button>
                         </div>
                         <div className="w-screen h-1.5 m-0 p-0 bg-aggie-maroon"/>
@@ -320,6 +378,7 @@ export default function Class(){
                             docTypes={docTypes}
                             tasks={tasks}
                             onClose={handleUploadCloseModal}
+                            refreshDocs={() => (fetchClassData(classId))}
                         />
                     </Modal.Body>
                 </Modal.Content>
@@ -360,7 +419,7 @@ export default function Class(){
                 closeDetailsModal={() => {setDetailsModalOpen(false); setNewRemark("")}}
                 detailsModalOpen={detailsModalOpen}
                 detailsFileName={detailsFileName}
-                onDocumentVoided={onDocumentVoided}
+                onDocumentVoided={() => (fetchClassData(classId))}
             />
         </div>
     );

@@ -150,7 +150,7 @@ export default function DocumentDetails(
                                         <Modal.CloseButton data-testid="voidCloseButton" />
                                     </Modal.Header>
                                     <Modal.Body>
-                                        <VoidDoc docId={documentDetails?.documentId} onClose={handleCloseVoidDocModal} onDocumentVoided={onDocumentVoided}/>
+                                        <VoidDoc docId={documentDetails?.documentId} onClose={() => {handleCloseVoidDocModal(); closeDetailsModal()}} onDocumentVoided={onDocumentVoided} />
                                     </Modal.Body>
                                 </Modal.Content>
                             </Modal.Root>

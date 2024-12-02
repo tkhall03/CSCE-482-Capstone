@@ -11,6 +11,7 @@ interface UploadDocumentProps{
     docTypes: DocType[];
     tasks: Task[];
     onClose: () => void;
+    refreshDocs: () => void;
 }
 
 interface FormDataProps {
@@ -25,7 +26,8 @@ export default function UploadDoc({
     className,
     docTypes,
     tasks,
-    onClose
+    onClose,
+    refreshDocs
 }: UploadDocumentProps) {
     const uniqueTasks = Array.from(new Map(tasks.map(task => [task.taskId, task])).values());
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
@@ -55,6 +57,7 @@ export default function UploadDoc({
             if (response.ok) {
                 console.log("Form submitted successfully");
                 onClose();
+                refreshDocs();
             } else {
                 alert("error uploading document");
             }
