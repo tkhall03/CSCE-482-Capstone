@@ -3,13 +3,14 @@ import { useForm } from "react-hook-form";
 interface VoidDocProps {
     docId: number;
     onClose: () => void;
+    onDocumentVoided: () => void;
 }
 
 interface FormDataProps {
     voidRemark: string;
 }
 
-export default function VoidDoc({ docId, onClose }: VoidDocProps) {
+export default function VoidDoc({ docId, onClose, onDocumentVoided }: VoidDocProps) {
     const {
         register,
         handleSubmit,
@@ -40,6 +41,7 @@ export default function VoidDoc({ docId, onClose }: VoidDocProps) {
 
             if (response.ok) {
                 console.log("Form submitted successfully");
+                onDocumentVoided();
                 onClose();
             } else {
                 console.error("Error submitting form");

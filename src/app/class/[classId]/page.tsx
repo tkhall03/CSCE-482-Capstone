@@ -27,6 +27,7 @@ export default function Class(){
     const [docTypes, setdocTypes] = useState<DocType[]>([]);
     const [documents, setDocuments] = useState<DocumentProp[]>([]);
     const [classes, setClasses] = useState<ClassData>();
+    const [reloadTrigger, setReloadTrigger] = useState<boolean>(false);
     const [documentBlob, setDocumentBlob] = useState<string>('');
     const [pageNumber, setPageNumber] = useState<number>(1);
     const [pdfModalOpen, setPdfModalOpen] = useState<boolean>(false);
@@ -86,9 +87,22 @@ export default function Class(){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/classes/${classId}`)
         const data = await response.json()
         console.log(data)
+        const sortedDocuments = data.documents.sort((a: DocumentProp, b: DocumentProp) => {
+            if (a.valid && !b.valid) {
+                return -1; 
+            }
+            if (!a.valid && b.valid) {
+                return 1; 
+            }
+            return 0;
+        });
         setClasses(data)
-        setDocuments(data.documents)
+        setDocuments(sortedDocuments)
     }
+
+    const onDocumentVoided = () => {
+        setReloadTrigger((prev) => !prev); // Trigger reload only when voiding happens
+    };
 
     async function fetchPdf(documentNum: number){
         const response = await fetch(`https://csce482capstone.csce482capstone.me/api/Documents/${documentNum}`, { headers: {responseType: 'blob'}})
@@ -125,7 +139,7 @@ export default function Class(){
             }
         }
         fetchDocTypes();
-    }, [params]);
+    }, [params, reloadTrigger]);
 
     function documentHeaders(feild: number){
         const feilds = ["Syllabus", "Attendance", "Sample Test"]
@@ -346,6 +360,7 @@ export default function Class(){
                 closeDetailsModal={() => {setDetailsModalOpen(false); setNewRemark("")}}
                 detailsModalOpen={detailsModalOpen}
                 detailsFileName={detailsFileName}
+                onDocumentVoided={onDocumentVoided}
             />
         </div>
     );
