@@ -405,6 +405,7 @@ export default function Class(){
                 documentDetails={documentDetails}
                 newRemark={newRemark}
                 setNewRemark={setNewRemark}
+                getClassData={() => fetchClassData(Number(Array.isArray(params.classId) ? params.classId[0] : params.classId))}
                 fetchDocumentData={fetchDocumentData}
                 closeDetailsModal={() => {setDetailsModalOpen(false); setNewRemark("")}}
                 detailsModalOpen={detailsModalOpen}

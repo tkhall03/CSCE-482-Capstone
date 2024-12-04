@@ -13,7 +13,8 @@ interface DocumentDetailsProps {
     fetchDocumentData: (arg0: number) => void,
     closeDetailsModal: () => void,
     detailsModalOpen: boolean,
-    detailsFileName: string
+    detailsFileName: string,
+    getClassData: () => void;
 }
 
 export default function DocumentDetails(
@@ -27,7 +28,8 @@ export default function DocumentDetails(
         fetchDocumentData,
         closeDetailsModal, 
         detailsModalOpen, 
-        detailsFileName
+        detailsFileName,
+        getClassData
     }: DocumentDetailsProps){
     
     async function addNewRemark(){
@@ -148,7 +150,7 @@ export default function DocumentDetails(
                                         <Modal.CloseButton data-testid="voidCloseButton" />
                                     </Modal.Header>
                                     <Modal.Body>
-                                        <VoidDoc docId={documentDetails?.documentId} onClose={() => {handleCloseVoidDocModal(); closeDetailsModal()}} fetchDocumentData={() => {fetchDocumentData(documentDetails.documentId)}}/>
+                                        <VoidDoc docId={documentDetails?.documentId} onClose={() => {handleCloseVoidDocModal(); closeDetailsModal(); getClassData(); }} fetchDocumentData={() => {fetchDocumentData(documentDetails.documentId)}}/>
                                     </Modal.Body>
                                 </Modal.Content>
                             </Modal.Root>
